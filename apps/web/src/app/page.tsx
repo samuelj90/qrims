@@ -7,7 +7,6 @@ import {
   ShieldAlert, 
   Activity, 
   Users, 
-  Settings as SettingsIcon,
   ShoppingCart,
   Zap
 } from 'lucide-react';
