@@ -1,5 +1,6 @@
 # Build Stage
 FROM node:18-alpine AS builder
+RUN sed -i 's/https/http/g' /etc/apk/repositories && apk add --no-cache openssl
 WORKDIR /app
 
 ARG NODE_TLS_REJECT_UNAUTHORIZED
@@ -18,6 +19,7 @@ RUN cd apps/backend && npx prisma generate && npm run build
 
 # Production Stage
 FROM node:18-alpine
+RUN sed -i 's/https/http/g' /etc/apk/repositories && apk add --no-cache openssl
 WORKDIR /app
 
 COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
@@ -28,4 +30,4 @@ COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["node", "apps/backend/dist/src/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node apps/backend/dist/main"]
