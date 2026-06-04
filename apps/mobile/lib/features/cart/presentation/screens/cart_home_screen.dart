@@ -24,7 +24,7 @@ class CartHomeScreen extends ConsumerWidget {
     ];
 
     // Pick a random mock scanned product QR payload to add to the cart
-    final randomPayload = (mockPayloads..shuffle()).first;
+    final randomPayload = (List.from(mockPayloads)..shuffle()).first;
     final randomSku = randomPayload.split(':')[0];
     ref.read(cartProvider.notifier).addScannedItem(randomPayload);
 
