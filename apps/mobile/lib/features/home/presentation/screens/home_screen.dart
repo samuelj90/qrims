@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../cart/presentation/controllers/cart_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -10,10 +11,13 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final user = authState.user;
+    
+    final cartState = ref.watch(cartProvider);
+    final totalCount = cartState.items.fold<int>(0, (sum, item) => sum + item.quantity);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QRIMS Home'),
+        title: const Text('Home'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout_rounded),
@@ -51,14 +55,6 @@ class HomeScreen extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              const SizedBox(height: 4),
-              Chip(
-                label: Text(
-                  'Role: ${user?.role ?? 'CUSTOMER'}',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-              ),
               const SizedBox(height: 40),
 
               // Quick Actions Grid (Adaptive for tablets vs phones)
@@ -74,7 +70,7 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     _ActionCard(
                       icon: Icons.add_shopping_cart_rounded,
-                      title: 'Create Cart',
+                      title: totalCount > 0 ? 'Go to Cart ($totalCount)' : 'Create Cart',
                       color: Colors.indigo,
                       onTap: () => context.go('/cart'),
                     ),
@@ -83,24 +79,6 @@ class HomeScreen extends ConsumerWidget {
                       title: 'Scan QR Barcode',
                       color: Colors.teal,
                       onTap: () => context.go('/cart'),
-                    ),
-                    _ActionCard(
-                      icon: Icons.settings_suggest_rounded,
-                      title: 'Settings',
-                      color: Colors.amber,
-                      onTap: () => context.go('/settings'),
-                    ),
-                    _ActionCard(
-                      icon: Icons.security_rounded,
-                      title: 'Change Password',
-                      color: Colors.deepOrange,
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Password changes routed securely via REST API.'),
-                          ),
-                        );
-                      },
                     ),
                   ],
                 ),

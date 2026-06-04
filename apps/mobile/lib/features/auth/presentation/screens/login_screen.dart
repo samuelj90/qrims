@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../controllers/auth_controller.dart';
+import '../../../../core/config/app_config.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -79,17 +80,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 32),
 
                   // Gateway Server IP (Replaces legacy SQLite settings connection parameters)
-                  TextFormField(
-                    controller: _ipController,
-                    decoration: const InputDecoration(
-                      labelText: 'Server Gateway IP',
-                      prefixIcon: Icon(Icons.dns_rounded),
-                      border: OutlineInputBorder(),
+                  if (AppConfig.enableSimulationDebug) ...[
+                    TextFormField(
+                      controller: _ipController,
+                      decoration: const InputDecoration(
+                        labelText: 'Server Gateway IP',
+                        prefixIcon: Icon(Icons.dns_rounded),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (val) =>
+                          val == null || val.isEmpty ? 'Server IP is required' : null,
                     ),
-                    validator: (val) =>
-                        val == null || val.isEmpty ? 'Server IP is required' : null,
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Username
                   TextFormField(

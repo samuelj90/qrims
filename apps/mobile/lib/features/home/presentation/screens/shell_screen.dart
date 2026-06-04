@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/shared_widgets/adaptive_scaffold.dart';
+import '../../../cart/presentation/controllers/cart_controller.dart';
 
-class ShellScreen extends StatelessWidget {
+class ShellScreen extends ConsumerWidget {
   final Widget child;
   final GoRouterState state;
 
@@ -34,28 +36,41 @@ class ShellScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final location = state.uri.toString();
     final selectedIndex = _getSelectedIndex(location);
+
+    final cartState = ref.watch(cartProvider);
+    final totalCount = cartState.items.fold<int>(0, (sum, item) => sum + item.quantity);
 
     return AdaptiveScaffold(
       selectedIndex: selectedIndex,
       onDestinationSelected: (idx) => _onItemTapped(idx, context),
-      destinations: const [
-        AdaptiveDestination(
+      destinations: [
+        const AdaptiveDestination(
           label: 'Home',
-          icon: Icons.home_rounded,
-          selectedIcon: Icons.home_filled,
+          icon: Icon(Icons.home_rounded),
+          selectedIcon: Icon(Icons.home_filled),
         ),
         AdaptiveDestination(
           label: 'Cart',
-          icon: Icons.shopping_cart_outlined,
-          selectedIcon: Icons.shopping_cart_rounded,
+          icon: totalCount > 0
+              ? Badge(
+                  label: Text('$totalCount'),
+                  child: const Icon(Icons.shopping_cart_outlined),
+                )
+              : const Icon(Icons.shopping_cart_outlined),
+          selectedIcon: totalCount > 0
+              ? Badge(
+                  label: Text('$totalCount'),
+                  child: const Icon(Icons.shopping_cart_rounded),
+                )
+              : const Icon(Icons.shopping_cart_rounded),
         ),
-        AdaptiveDestination(
+        const AdaptiveDestination(
           label: 'Settings',
-          icon: Icons.settings_outlined,
-          selectedIcon: Icons.settings_rounded,
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings_rounded),
         ),
       ],
       body: child,

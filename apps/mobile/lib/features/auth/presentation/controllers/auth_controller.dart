@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 import '../../domain/models/user.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../../core/services/sync_service.dart';
+import '../../../../core/network/dio_provider.dart';
 
 class AuthState {
   final User? user;
@@ -31,7 +33,7 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final Ref _ref;
   final _storage = const FlutterSecureStorage();
-  final _dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5)));
+  Dio get _dio => _ref.read(dioProvider);
 
   AuthNotifier(this._ref) : super(const AuthState()) {
     _loadPersistedUser();
@@ -44,6 +46,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final role = await _storage.read(key: 'role');
 
     if (token != null && userId != null && username != null && role != null) {
+      if (!mounted) return;
       state = AuthState(
         user: User(id: userId, username: username, role: role, token: token),
       );
@@ -53,8 +56,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<bool> login(String serverIp, String username, String password) async {
     state = state.copyWith(isLoading: true);
     try {
+      final baseUrl = AppConfig.enableSimulationDebug
+          ? 'http://$serverIp:3000/api/v1'
+          : AppConfig.apiBaseUrl;
+
       final response = await _dio.post(
-        'http://$serverIp:3000/api/v1/auth/login',
+        '$baseUrl/auth/login',
         data: {'username': username, 'password': password},
       );
 
@@ -72,16 +79,45 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
         state = AuthState(user: user);
 
-        // Proactively pull the latest product catalog from the backend
+        // Proactively pull the latest product catalog and process offline checkouts
         _ref.read(syncServiceProvider).downloadCatalog();
+        _ref.read(syncServiceProvider).processOfflineQueue();
+        _ref.read(syncServiceProvider).fetchShopSettings();
 
         return true;
       } else {
-        state = state.copyWith(errorMessage: 'Invalid credentials');
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Invalid credentials',
+        );
         return false;
       }
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Connection failed: Check Server IP / Network');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Connection failed: Check Server IP / Network',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> changePassword(String newPassword) async {
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      if (token == null) return false;
+
+      final baseUrl = AppConfig.enableSimulationDebug
+          ? 'http://localhost:3000/api/v1'
+          : AppConfig.apiBaseUrl;
+
+      final response = await _dio.put(
+        '$baseUrl/auth/change-password',
+        data: {'newPassword': newPassword},
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      return response.statusCode == 200;
+    } catch (_) {
       return false;
     }
   }

@@ -4,20 +4,56 @@ import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../local_db/drift_database.dart';
+import '../config/app_config.dart';
+import '../network/dio_provider.dart';
 
 class SyncService {
   final Ref _ref;
-  final _dio = Dio();
+  Dio get _dio => _ref.read(dioProvider);
   final _storage = const FlutterSecureStorage();
 
   SyncService(this._ref) {
+    // Proactively process offline queue and sync catalog on startup
+    processOfflineQueue();
+    downloadCatalog();
+    fetchShopSettings();
+
     // Listen to network changes
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (result != ConnectivityResult.none) {
         processOfflineQueue();
         downloadCatalog();
+        fetchShopSettings();
       }
     });
+  }
+
+  Future<void> fetchShopSettings() async {
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      if (token == null) return;
+
+      final String url;
+      if (AppConfig.enableSimulationDebug) {
+        url = 'http://localhost:3000/api/v1/settings';
+      } else {
+        url = '${AppConfig.apiBaseUrl}/settings';
+      }
+
+      final response = await _dio.get(
+        url,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        await _storage.write(key: 'supermarket_name', value: data['name'] ?? 'QRBS Supermarket');
+        await _storage.write(key: 'supermarket_address', value: data['address'] ?? '123052/Street, City');
+        await _storage.write(key: 'supermarket_phone', value: data['phoneNumber'] ?? '944858585858');
+      }
+    } catch (_) {
+      // Fail silently
+    }
   }
 
   AppDatabase get _db => _ref.read(databaseProvider);
@@ -28,15 +64,25 @@ class SyncService {
       final queue = await _db.getSyncQueue();
       if (queue.isEmpty) return;
 
-      final serverIp = await _storage.read(key: 'server_ip') ?? '192.168.1.12';
       final token = await _storage.read(key: 'jwt_token');
       if (token == null) return;
+
+      final String baseUrl;
+      if (AppConfig.enableSimulationDebug) {
+        final serverIp = await _storage.read(key: 'server_ip') ?? '192.168.1.12';
+        baseUrl = 'http://$serverIp:3000';
+      } else {
+        final apiIndex = AppConfig.apiBaseUrl.indexOf('/api/v1');
+        baseUrl = apiIndex != -1
+            ? AppConfig.apiBaseUrl.substring(0, apiIndex)
+            : AppConfig.apiBaseUrl;
+      }
 
       for (final item in queue) {
         final payload = jsonDecode(item.payload);
         
         final response = await _dio.post(
-          'http://$serverIp:3000${item.endpoint}',
+          '$baseUrl${item.endpoint}',
           data: payload,
           options: Options(headers: {'Authorization': 'Bearer $token'}),
         );
@@ -57,12 +103,19 @@ class SyncService {
   // Fetches real seeded products from backend and caches them locally
   Future<bool> downloadCatalog() async {
     try {
-      final serverIp = await _storage.read(key: 'server_ip') ?? '192.168.1.12';
       final token = await _storage.read(key: 'jwt_token');
       if (token == null) return false;
 
+      final String url;
+      if (AppConfig.enableSimulationDebug) {
+        final serverIp = await _storage.read(key: 'server_ip') ?? '192.168.1.12';
+        url = 'http://$serverIp:3000/api/v1/products';
+      } else {
+        url = '${AppConfig.apiBaseUrl}/products';
+      }
+
       final response = await _dio.get(
-        'http://$serverIp:3000/api/v1/products',
+        url,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 

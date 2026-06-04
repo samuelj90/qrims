@@ -28,7 +28,7 @@ class AdaptiveScaffold extends StatelessWidget {
               type: BottomNavigationBarType.fixed,
               items: destinations
                   .map((d) => BottomNavigationBarItem(
-                        icon: Icon(d.icon),
+                        icon: d.icon,
                         label: d.label,
                       ))
                   .toList(),
@@ -47,8 +47,8 @@ class AdaptiveScaffold extends StatelessWidget {
                   labelType: NavigationRailLabelType.selected,
                   destinations: destinations
                       .map((d) => NavigationRailDestination(
-                            icon: Icon(d.icon),
-                            selectedIcon: Icon(d.selectedIcon ?? d.icon),
+                            icon: d.icon,
+                            selectedIcon: d.selectedIcon ?? d.icon,
                             label: Text(d.label),
                           ))
                       .toList(),
@@ -88,9 +88,11 @@ class AdaptiveScaffold extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             key: ValueKey(destination.label),
                             child: ListTile(
-                              leading: Icon(
-                                destination.icon,
-                                color: isSelected ? Theme.of(context).colorScheme.primary : null,
+                              leading: IconTheme(
+                                data: IconThemeData(
+                                  color: isSelected ? Theme.of(context).colorScheme.primary : null,
+                                ),
+                                child: destination.icon,
                               ),
                               title: Text(
                                 destination.label,
@@ -124,8 +126,8 @@ class AdaptiveScaffold extends StatelessWidget {
 
 class AdaptiveDestination {
   final String label;
-  final IconData icon;
-  final IconData? selectedIcon;
+  final Widget icon;
+  final Widget? selectedIcon;
 
   const AdaptiveDestination({
     required this.label,

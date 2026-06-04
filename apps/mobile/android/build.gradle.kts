@@ -22,7 +22,7 @@ subprojects {
     val configureAndroid = {
         if (plugins.hasPlugin("com.android.application") || plugins.hasPlugin("com.android.library")) {
             extensions.configure<com.android.build.gradle.BaseExtension> {
-                compileSdkVersion(35)
+                compileSdkVersion(36)
             }
         }
     }

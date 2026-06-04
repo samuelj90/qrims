@@ -175,3 +175,19 @@ jobs:
       - name: Test Build Docker Compose Stack
         run: |
           docker compose build
+
+  landing-page-deploy:
+    name: Landing Page Deploy CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy static landing page to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_LANDING }}
+          working-directory: apps/landing-page
+          vercel-args: '--prod'

@@ -2,4 +2,5 @@
 class AppConfig {
   static const String cdnBaseUrl = 'https://raw.githubusercontent.com/samuelj90/qrims/master';
   static const String apiBaseUrl = 'http://localhost:3000/api/v1';
+  static const bool enableSimulationDebug = true;
 }

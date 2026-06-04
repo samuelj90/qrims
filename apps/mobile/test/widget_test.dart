@@ -10,7 +10,7 @@ void main() {
     // Mock FlutterSecureStorage platform channel to prevent platform exceptions in test
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.itrix.com.br/flutter_secure_storage'),
+      const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
       (MethodCall methodCall) async {
         return null;
       },

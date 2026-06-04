@@ -4,6 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../controllers/cart_controller.dart';
 import '../../../../core/services/print_service.dart';
 import '../../domain/models/cart_item.dart';
+import '../../../../core/config/app_config.dart';
+import 'qr_scanner_screen.dart';
 
 class CartHomeScreen extends ConsumerWidget {
   const CartHomeScreen({super.key});
@@ -34,6 +36,52 @@ class CartHomeScreen extends ConsumerWidget {
         duration: const Duration(seconds: 1),
       ),
     );
+  }
+
+  void _handleScanPressed(BuildContext context, WidgetRef ref) {
+    if (AppConfig.enableSimulationDebug) {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_rounded),
+                  title: const Text('Scan with Camera'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _openCameraScan(context, ref);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.bug_report_rounded),
+                  title: const Text('Simulate Scan (Mock Product)'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _simulateScan(context, ref);
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      _openCameraScan(context, ref);
+    }
+  }
+
+  void _openCameraScan(BuildContext context, WidgetRef ref) async {
+    final scannedPayload = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
+    );
+
+    if (scannedPayload != null && scannedPayload.isNotEmpty) {
+      ref.read(cartProvider.notifier).addScannedItem(scannedPayload);
+    }
   }
 
   // Shows Wi-Fi scanning dialogue and trigger ESC/POS print commands
@@ -149,7 +197,7 @@ class CartHomeScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.qr_code_scanner_rounded),
             tooltip: 'Scan Barcode',
-            onPressed: () => _simulateScan(context, ref),
+            onPressed: () => _handleScanPressed(context, ref),
           ),
           IconButton(
             icon: const Icon(Icons.delete_sweep_rounded),
@@ -170,12 +218,21 @@ class CartHomeScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   const Text('Cart is empty. Start scanning products!'),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () => _simulateScan(context, ref),
-                    icon: const Icon(Icons.add_to_photos_rounded),
-                    label: const Text('Simulate Scan'),
-                  ),
+                  if (AppConfig.enableSimulationDebug) ...[
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => _simulateScan(context, ref),
+                      icon: const Icon(Icons.add_to_photos_rounded),
+                      label: const Text('Simulate Scan'),
+                    ),
+                  ] else ...[
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => _openCameraScan(context, ref),
+                      icon: const Icon(Icons.qr_code_scanner_rounded),
+                      label: const Text('Scan QR Code'),
+                    ),
+                  ],
                 ],
               ),
             )

@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../domain/models/cart_item.dart';
 import '../../../../core/local_db/drift_database.dart';
+import '../../../../core/services/sync_service.dart';
+import '../../../../core/config/app_config.dart';
+import '../../../../core/network/dio_provider.dart';
 
 class CartState {
   final List<CartItem> items;
@@ -38,7 +42,7 @@ class CartState {
 
 class CartNotifier extends StateNotifier<CartState> {
   final Ref _ref;
-  final _dio = Dio();
+  Dio get _dio => _ref.read(dioProvider);
   final _storage = const FlutterSecureStorage();
 
   CartNotifier(this._ref) : super(const CartState()) {
@@ -58,6 +62,7 @@ class CartNotifier extends StateNotifier<CartState> {
         tax: dbItem.tax,
         quantity: dbItem.quantity,
       )).toList();
+      if (!mounted) return;
       state = state.copyWith(items: items);
     } catch (_) {
       // Handle db reading errors gracefully
@@ -111,8 +116,8 @@ class CartNotifier extends StateNotifier<CartState> {
         ));
       }
     } catch (e, stack) {
-      print('DEBUG SCAN ERROR: $e');
-      print('STACKTRACE: $stack');
+      debugPrint('DEBUG SCAN ERROR: $e');
+      debugPrint('STACKTRACE: $stack');
       state = state.copyWith(errorMessage: 'Scan Error: $e');
     }
   }
@@ -169,8 +174,32 @@ class CartNotifier extends StateNotifier<CartState> {
         return;
       }
 
+      // Check if there are already pending checkouts in the offline queue to preserve order
+      final pendingQueue = await _db.getSyncQueue();
+      if (pendingQueue.isNotEmpty) {
+        await _db.enqueueSync(SyncQueueCompanion.insert(
+          endpoint: '/api/v1/carts/checkout',
+          payload: jsonEncode(payload),
+        ));
+        
+        // Trigger background sync processing
+        _ref.read(syncServiceProvider).processOfflineQueue();
+        
+        state = state.copyWith(
+          isSubmitting: false,
+          successMessage: 'Checkout queued in sync list (pending offline tasks).',
+          items: [],
+        );
+        await _db.clearCart();
+        return;
+      }
+
+      final url = AppConfig.enableSimulationDebug
+          ? 'http://$serverIp:3000/api/v1/carts/checkout'
+          : '${AppConfig.apiBaseUrl}/carts/checkout';
+
       final response = await _dio.post(
-        'http://$serverIp:3000/api/v1/carts/checkout',
+        url,
         data: payload,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );

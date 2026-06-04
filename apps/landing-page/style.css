@@ -587,7 +587,215 @@ footer {
   font-size: 0.85rem;
 }
 
-/* Responsive adjustments */
+/* ============================================================
+   Screenshots Showcase Section
+   ============================================================ */
+.screenshots-section {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem 8rem;
+}
+
+.screenshots-showcase {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+/* Panel wrapper */
+.screenshot-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Label row above each frame */
+.screenshot-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.screenshot-label-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-admin  { background: var(--primary); box-shadow: 0 0 8px var(--primary-glow); }
+.dot-mobile { background: var(--success); box-shadow: 0 0 8px rgba(16,185,129,0.5); }
+
+.screenshot-badge {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.badge-web    { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); }
+.badge-flutter { background: rgba(6,182,212,0.12); color: #67e8f9; border: 1px solid rgba(6,182,212,0.2); }
+
+/* --- Browser Frame --- */
+.browser-frame {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 30px 60px -20px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 60px rgba(99,102,241,0.08);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease;
+  background: #0d1117;
+}
+
+.browser-frame:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow:
+    0 40px 80px -20px rgba(0,0,0,0.8),
+    0 0 0 1px rgba(255,255,255,0.07),
+    0 0 80px rgba(99,102,241,0.14);
+}
+
+.browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: #1a1f2e;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.browser-dots {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.bd {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.bd-red    { background: #ff5f57; }
+.bd-yellow { background: #febc2e; }
+.bd-green  { background: #28c840; }
+
+.browser-url {
+  flex: 1;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.browser-content img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* --- Phone Frame --- */
+.screenshot-panel-mobile {
+  padding-top: 1rem; /* align labels visually */
+}
+
+.phone-frame {
+  position: relative;
+  background: #1a1f2e;
+  border-radius: 46px;
+  border: 2px solid rgba(255,255,255,0.1);
+  padding: 14px 10px 20px;
+  box-shadow:
+    0 30px 70px -20px rgba(0,0,0,0.8),
+    0 0 0 1px rgba(255,255,255,0.04),
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    0 0 60px rgba(6,182,212,0.07);
+  max-width: 290px;
+  margin: 0 auto;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease;
+}
+
+.phone-frame:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow:
+    0 40px 90px -20px rgba(0,0,0,0.9),
+    0 0 0 1px rgba(255,255,255,0.07),
+    inset 0 0 0 1px rgba(255,255,255,0.08),
+    0 0 80px rgba(6,182,212,0.13);
+}
+
+.phone-notch {
+  width: 100px;
+  height: 26px;
+  background: #1a1f2e;
+  border-radius: 0 0 18px 18px;
+  margin: 0 auto 8px;
+  position: relative;
+  z-index: 2;
+  border: 2px solid rgba(255,255,255,0.08);
+  border-top: none;
+}
+
+.phone-screen {
+  border-radius: 32px;
+  overflow: hidden;
+  background: #f1f1f5;
+  line-height: 0;
+}
+
+.phone-screen img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.phone-home-bar {
+  width: 100px;
+  height: 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 100px;
+  margin: 10px auto 0;
+}
+
+/* Caption below each frame */
+.screenshot-caption {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  padding: 0 0.25rem;
+}
+
+/* ============================================================
+   Responsive adjustments
+   ============================================================ */
+@media (max-width: 1024px) {
+  .screenshots-showcase {
+    grid-template-columns: 1fr;
+  }
+
+  .screenshot-panel-mobile {
+    padding-top: 0;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+}
+
 @media (max-width: 968px) {
   .bento-grid {
     grid-template-columns: 1fr;

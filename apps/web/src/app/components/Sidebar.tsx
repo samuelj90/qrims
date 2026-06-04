@@ -6,16 +6,25 @@ import { usePathname } from 'next/navigation';
 import { 
   Activity, 
   Users, 
-  QrCode
+  QrCode,
+  Settings
 } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [profilePic, setProfilePic] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setProfilePic(localStorage.getItem('web_profile_picture_path'));
+    }
+  }, []);
 
   const links = [
     { href: '/', label: 'Dashboard', icon: Activity },
     { href: '/users', label: 'User Management', icon: Users },
     { href: '/products', label: 'Product QR Catalog', icon: QrCode },
+    { href: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -52,15 +61,19 @@ export default function Sidebar() {
       </div>
 
       <div className="border-t border-slate-800 pt-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-300">
-            AD
-          </div>
+        <Link href="/settings" className="flex items-center gap-3 hover:opacity-85 transition-opacity">
+          {profilePic ? (
+            <img src={profilePic} alt="User Profile" className="w-10 h-10 rounded-full object-cover border border-slate-700" />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-300">
+              OP
+            </div>
+          )}
           <div>
-            <p className="text-sm font-medium">Admin User</p>
-            <p className="text-xs text-slate-500">admin@qrims.com</p>
+            <p className="text-sm font-medium text-slate-200">System Operator</p>
+            <p className="text-xs text-slate-500">operator@qrims.com</p>
           </div>
-        </div>
+        </Link>
       </div>
     </aside>
   );
