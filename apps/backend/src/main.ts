@@ -10,11 +10,14 @@ async function bootstrap() {
   // Security Headers
   app.use(helmet());
 
-  // CORS config
+  // CORS config (Secure by default: block wildcard credentials leakage)
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : false;
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*',
+    origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
+    credentials: allowedOrigins !== false,
   });
 
   // API path prefixing and versioning

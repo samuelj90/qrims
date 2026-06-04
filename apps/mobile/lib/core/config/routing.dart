@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/home/presentation/screens/shell_screen.dart';
+import '../../features/cart/presentation/screens/cart_home_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -10,30 +15,28 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/login',
-      builder: (context, state) => const Scaffold(
-        body: Center(child: Text('Login Screen (NestJS REST auth integration)')),
-      ),
+      builder: (context, state) => const LoginScreen(),
     ),
     ShellRoute(
       navigatorKey: shellNavigatorKey,
       builder: (context, state, child) {
-        // Here we'd embed the AdaptiveScaffold wrapping the child view
-        return Scaffold(
-          body: child,
+        return ShellScreen(
+          state: state,
+          child: child,
         );
       },
       routes: [
         GoRoute(
           path: '/home',
-          builder: (context, state) => const Center(child: Text('Welcome to QRIMS')),
+          builder: (context, state) => const HomeScreen(),
         ),
         GoRoute(
           path: '/cart',
-          builder: (context, state) => const Center(child: Text('Shopping Cart & Scanning')),
+          builder: (context, state) => const CartHomeScreen(),
         ),
         GoRoute(
           path: '/settings',
-          builder: (context, state) => const Center(child: Text('Settings (Offline Drift Cache)')),
+          builder: (context, state) => const SettingsScreen(),
         ),
       ],
     ),

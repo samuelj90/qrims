@@ -1,0 +1,93 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:dio/dio.dart';
+import '../../domain/models/user.dart';
+
+class AuthState {
+  final User? user;
+  final bool isLoading;
+  final String? errorMessage;
+
+  const AuthState({
+    this.user,
+    this.isLoading = false,
+    this.errorMessage,
+  });
+
+  AuthState copyWith({
+    User? user,
+    bool? isLoading,
+    String? errorMessage,
+  }) {
+    return AuthState(
+      user: user ?? this.user,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage,
+    );
+  }
+}
+
+class AuthNotifier extends StateNotifier<AuthState> {
+  final _storage = const FlutterSecureStorage();
+  final _dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5)));
+
+  AuthNotifier() : super(const AuthState()) {
+    _loadPersistedUser();
+  }
+
+  Future<void> _loadPersistedUser() async {
+    final token = await _storage.read(key: 'jwt_token');
+    final userId = await _storage.read(key: 'user_id');
+    final username = await _storage.read(key: 'username');
+    final role = await _storage.read(key: 'role');
+
+    if (token != null && userId != null && username != null && role != null) {
+      state = AuthState(
+        user: User(id: userId, username: username, role: role, token: token),
+      );
+    }
+  }
+
+  Future<bool> login(String serverIp, String username, String password) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final response = await _dio.post(
+        'http://$serverIp:3000/api/v1/auth/login',
+        data: {'username': username, 'password': password},
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        final token = data['accessToken'] as String;
+        final user = User.fromJson(data, token);
+
+        // Persist token in secure storage
+        await _storage.write(key: 'jwt_token', value: token);
+        await _storage.write(key: 'user_id', value: user.id);
+        await _storage.write(key: 'username', value: user.username);
+        await _storage.write(key: 'role', value: user.role);
+
+        state = AuthState(user: user);
+        return true;
+      } else {
+        state = state.copyWith(errorMessage: 'Invalid credentials');
+        return false;
+      }
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Connection failed: Check Server IP / Network');
+      return false;
+    }
+  }
+
+  Future<void> logout() async {
+    await _storage.delete(key: 'jwt_token');
+    await _storage.delete(key: 'user_id');
+    await _storage.delete(key: 'username');
+    await _storage.delete(key: 'role');
+    state = const AuthState();
+  }
+}
+
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier();
+});
