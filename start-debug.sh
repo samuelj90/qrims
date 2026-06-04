@@ -3,6 +3,9 @@
 # Exit on any error
 set -e
 
+echo "--> Syncing application configuration..."
+node sync_config.js
+
 echo "=========================================="
 echo " Starting QRIMS Local Debug Ecosystem     "
 echo "=========================================="

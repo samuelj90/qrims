@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../domain/models/cart_item.dart';
+import '../../../../core/local_db/drift_database.dart';
 
 class CartState {
   final List<CartItem> items;
@@ -36,50 +37,99 @@ class CartState {
 }
 
 class CartNotifier extends StateNotifier<CartState> {
+  final Ref _ref;
   final _dio = Dio();
   final _storage = const FlutterSecureStorage();
 
-  CartNotifier() : super(const CartState());
+  CartNotifier(this._ref) : super(const CartState()) {
+    _loadCartFromDb();
+  }
 
-  void addScannedItem(String decryptedText) {
+  AppDatabase get _db => _ref.read(databaseProvider);
+
+  Future<void> _loadCartFromDb() async {
     try {
-      final newItem = CartItem.fromQrPayload(decryptedText);
-      final index = state.items.indexWhere((item) => item.id == newItem.id);
-
-      if (index >= 0) {
-        // Increment quantity if product is already in cart
-        final updatedItems = [...state.items];
-        updatedItems[index] = updatedItems[index].copyWith(
-          quantity: updatedItems[index].quantity + 1,
-        );
-        state = state.copyWith(items: updatedItems);
-      } else {
-        // Add new item
-        state = state.copyWith(items: [...state.items, newItem]);
-      }
-    } catch (e) {
-      state = state.copyWith(errorMessage: 'Invalid QR Payload configuration');
+      final dbItems = await _db.getCartItems();
+      final items = dbItems.map((dbItem) => CartItem(
+        id: dbItem.productId,
+        name: dbItem.name,
+        price: dbItem.price,
+        discount: dbItem.discount,
+        tax: dbItem.tax,
+        quantity: dbItem.quantity,
+      )).toList();
+      state = state.copyWith(items: items);
+    } catch (_) {
+      // Handle db reading errors gracefully
     }
   }
 
-  void updateQuantity(String productId, int quantity) {
+  Future<void> addScannedItem(String skuOrPayload) async {
+    try {
+      // 1. Try to look up by SKU in local database first (real seeded database data)
+      final localProd = await _db.getProductBySku(skuOrPayload);
+      CartItem newItem;
+      
+      if (localProd != null) {
+        newItem = CartItem(
+          id: localProd.id, // Use actual Product UUID ID
+          name: localProd.name,
+          price: localProd.price,
+          discount: localProd.discount,
+          tax: localProd.tax,
+          quantity: 1,
+        );
+      } else {
+        // Fallback: Parse decrypted text QR payload directly
+        newItem = CartItem.fromQrPayload(skuOrPayload);
+      }
+
+      final index = state.items.indexWhere((item) => item.id == newItem.id);
+
+      if (index >= 0) {
+        final updatedQty = state.items[index].quantity + 1;
+        final updatedItems = [...state.items];
+        updatedItems[index] = updatedItems[index].copyWith(quantity: updatedQty);
+        
+        state = state.copyWith(items: updatedItems);
+        await _db.updateCartItemQuantity(newItem.id, updatedQty);
+      } else {
+        state = state.copyWith(items: [...state.items, newItem]);
+        await _db.addCartItem(LocalCartItemsCompanion.insert(
+          productId: newItem.id,
+          name: newItem.name,
+          price: newItem.price,
+          discount: newItem.discount,
+          tax: newItem.tax,
+          quantity: 1,
+        ));
+      }
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Product SKU not found / Invalid QR Payload');
+    }
+  }
+
+  Future<void> updateQuantity(String productId, int quantity) async {
     if (quantity <= 0) {
-      removeItem(productId);
+      await removeItem(productId);
       return;
     }
     final updatedItems = state.items.map((item) {
       return item.id == productId ? item.copyWith(quantity: quantity) : item;
     }).toList();
     state = state.copyWith(items: updatedItems);
+    await _db.updateCartItemQuantity(productId, quantity);
   }
 
-  void removeItem(String productId) {
+  Future<void> removeItem(String productId) async {
     final updatedItems = state.items.where((item) => item.id != productId).toList();
     state = state.copyWith(items: updatedItems);
+    await _db.removeCartItem(productId);
   }
 
-  void clearCart() {
+  Future<void> clearCart() async {
     state = const CartState();
+    await _db.clearCart();
   }
 
   Future<void> checkout(String serverIp) async {
@@ -96,13 +146,18 @@ class CartNotifier extends StateNotifier<CartState> {
       };
 
       if (connectivityResult == ConnectivityResult.none) {
-        // Offline Sync implementation: Cache checkout in database queue
-        // (In production, write record to Drift AppDatabase.syncQueue)
+        // Enqueue checkout payload into local SQLite SyncQueue table
+        await _db.enqueueSync(SyncQueueCompanion.insert(
+          endpoint: '/api/v1/carts/checkout',
+          payload: jsonEncode(payload),
+        ));
+        
         state = state.copyWith(
           isSubmitting: false,
           successMessage: 'Offline! Checkout queued. Will sync once connection is restored.',
           items: [],
         );
+        await _db.clearCart();
         return;
       }
 
@@ -118,6 +173,7 @@ class CartNotifier extends StateNotifier<CartState> {
           successMessage: 'Checkout succeeded! Order submitted.',
           items: [],
         );
+        await _db.clearCart();
       } else {
         state = state.copyWith(
           isSubmitting: false,
@@ -125,14 +181,32 @@ class CartNotifier extends StateNotifier<CartState> {
         );
       }
     } catch (e) {
-      state = state.copyWith(
-        isSubmitting: false,
-        errorMessage: 'Network error: checkout saved offline.',
-      );
+      // On network exception, fallback and save to SQLite queue
+      try {
+        final payload = {
+          'items': state.items.map((item) => item.toJson()).toList(),
+          'totalAmount': state.grandTotal,
+        };
+        await _db.enqueueSync(SyncQueueCompanion.insert(
+          endpoint: '/api/v1/carts/checkout',
+          payload: jsonEncode(payload),
+        ));
+        state = state.copyWith(
+          isSubmitting: false,
+          successMessage: 'Network error: checkout saved offline in sync queue.',
+          items: [],
+        );
+        await _db.clearCart();
+      } catch (innerError) {
+        state = state.copyWith(
+          isSubmitting: false,
+          errorMessage: 'Network error: failed to queue checkout offline.',
+        );
+      }
     }
   }
 }
 
 final cartProvider = StateNotifierProvider<CartNotifier, CartState>((ref) {
-  return CartNotifier();
+  return CartNotifier(ref);
 });

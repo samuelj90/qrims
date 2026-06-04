@@ -1,4 +1,4 @@
-import 'package:flutter/material';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../controllers/auth_controller.dart';
@@ -54,10 +54,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Premium Icon & Title
-                  Icon(
-                    Icons.qr_code_scanner_rounded,
-                    size: 72,
-                    color: Theme.of(context).colorScheme.primary,
+                  Center(
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      height: 80,
+                      width: 80,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(

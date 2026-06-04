@@ -1,0 +1,46 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Cyan glow effect -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Laser beam gradient -->
+    <linearGradient id="laser-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0" />
+      <stop offset="15%" stop-color="#06b6d4" stop-opacity="0.3" />
+      <stop offset="50%" stop-color="#06b6d4" stop-opacity="1" />
+      <stop offset="85%" stop-color="#06b6d4" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Dark rounded background -->
+  <rect width="512" height="512" rx="112" fill="#0f172a"/>
+
+  <!-- Left Face: Dark Indigo -->
+  <polygon points="143.42,191 143.42,321 256,386 256,256" fill="#312e81" />
+
+  <!-- Right Face: Medium Indigo -->
+  <polygon points="256,256 256,386 368.58,321 368.58,191" fill="#3730a3" />
+
+  <!-- Top Face: Light Indigo -->
+  <polygon points="256,126 143.42,191 256,256 368.58,191" fill="#4338ca" />
+
+  <!-- QR Finder Outer Rhombus (Neon Cyan) - R = 0.85 -->
+  <polygon points="256,135.75 160.3,191 256,246.25 351.7,191" fill="#06b6d4" />
+
+  <!-- QR Finder Middle Rhombus (Cutout - Matches Top Face) - R = 0.55 -->
+  <polygon points="256,155.25 194.1,191 256,226.75 317.9,191" fill="#4338ca" />
+
+  <!-- QR Finder Inner Rhombus (White Center) - R = 0.25 -->
+  <polygon points="256,174.75 227.9,191 256,207.25 284.1,191" fill="#ffffff" />
+
+  <!-- Scanning laser background glow -->
+  <polygon points="80,264 432,264 432,276 80,276" fill="url(#laser-grad)" opacity="0.15" />
+
+  <!-- Glowing laser lines -->
+  <line x1="80" y1="270" x2="432" y2="270" stroke="#06b6d4" stroke-width="6" stroke-linecap="round" filter="url(#glow)" />
+  <line x1="80" y1="270" x2="432" y2="270" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+</svg>

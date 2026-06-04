@@ -11,16 +11,43 @@ import {
   Zap
 } from 'lucide-react';
 
-export default function DashboardPage() {
+async function getDashboardData() {
+  const apiBaseUrl = process.env.API_URL || 'http://localhost:3000';
+  const url = `${apiBaseUrl}/api/v1/dashboard/stats`;
+  
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) {
+      throw new Error(`Failed to fetch stats: ${res.statusText}`);
+    }
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    return {
+      products: { totalActiveSkus: 0 },
+      users: { totalRegistered: 0, admins: 0, staff: 0, customers: 0 },
+      sales: { totalAmount: 0.0 },
+      devices: { activeTerminals: 0, pendingSyncs: 0 },
+      auditLogs: [],
+      dbStatus: 'unhealthy',
+    };
+  }
+}
+
+export default async function DashboardPage() {
+  const data = await getDashboardData();
+  const formattedSales = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(data.sales.totalAmount);
+
   return (
     <div className="flex-1 flex flex-col md:flex-row h-screen overflow-hidden">
       {/* Sidebar Navigation */}
       <aside className="w-full md:w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-3 mb-8">
-            <div className="p-2.5 bg-indigo-600 rounded-lg text-white font-bold">
-              QR
-            </div>
+            <img src="/logo.svg" alt="QRIMS Logo" className="w-10 h-10 object-contain" />
             <div>
               <h1 className="font-semibold text-lg leading-tight">QRIMS Platform</h1>
               <span className="text-xs text-slate-500">v2.0 Redesign</span>
@@ -83,7 +110,7 @@ export default function DashboardPage() {
             <div className="flex justify-between items-start">
               <div>
                 <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Ecosystem Checkout Flow</span>
-                <h3 className="text-3xl font-bold mt-1 text-slate-100">$24,950.50</h3>
+                <h3 className="text-3xl font-bold mt-1 text-slate-100">{formattedSales}</h3>
               </div>
               <span className="p-2 bg-indigo-950/50 text-indigo-400 border border-indigo-900/30 rounded-lg">
                 <TrendingUp size={20} />
@@ -99,9 +126,9 @@ export default function DashboardPage() {
             
             <div className="flex justify-between items-center text-xs text-slate-400 border-t border-slate-800/40 pt-4 mt-2">
               <span className="flex items-center gap-1 text-emerald-400">
-                <Zap size={12} /> +12.4% vs last week
+                <Zap size={12} /> Live sales volume
               </span>
-              <span>11 active cashiers</span>
+              <span>Active tracking</span>
             </div>
           </div>
 
@@ -121,14 +148,14 @@ export default function DashboardPage() {
             <div className="space-y-4 my-4">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-400">Active Terminals</span>
-                <span className="font-semibold text-slate-200">14 Online</span>
+                <span className="font-semibold text-slate-200">{data.devices.activeTerminals} Online</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-400">Sync Queue size</span>
-                <span className="px-2 py-0.5 bg-yellow-950 text-yellow-400 border border-yellow-900 text-xs rounded font-medium">0 Pending</span>
+                <span className="px-2 py-0.5 bg-yellow-950 text-yellow-400 border border-yellow-900 text-xs rounded font-medium">{data.devices.pendingSyncs} Pending</span>
               </div>
               <div className="w-full bg-slate-900 rounded-full h-1.5">
-                <div className="bg-cyan-500 h-1.5 rounded-full" style={{ width: '100%' }}></div>
+                <div className="bg-cyan-500 h-1.5 rounded-full" style={{ width: data.devices.pendingSyncs > 0 ? '50%' : '100%' }}></div>
               </div>
             </div>
 
@@ -144,11 +171,11 @@ export default function DashboardPage() {
               <ShoppingCart size={16} className="text-emerald-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">1,842</p>
+              <p className="text-2xl font-bold">{data.products.totalActiveSkus}</p>
               <p className="text-xs text-slate-400">Total active SKUs</p>
             </div>
             <div className="text-[11px] text-emerald-400 flex items-center gap-1">
-              <span>●</span> 4 new products added today
+              <span>●</span> Database-enforced catalog
             </div>
           </div>
 
@@ -181,27 +208,23 @@ export default function DashboardPage() {
               </div>
               
               <div className="space-y-3.5 max-h-[190px] overflow-y-auto pr-1 text-xs">
-                <div className="flex justify-between items-start border-b border-slate-900 pb-2.5">
-                  <div>
-                    <span className="text-slate-400 font-medium">[SYSTEM]</span>
-                    <p className="text-slate-300 mt-0.5">Flush Sync Queue for client terminal (Device ID: #F41A)</p>
-                  </div>
-                  <span className="text-slate-500">00:08</span>
-                </div>
-                <div className="flex justify-between items-start border-b border-slate-900 pb-2.5">
-                  <div>
-                    <span className="text-amber-400 font-medium">[SECURITY]</span>
-                    <p className="text-slate-300 mt-0.5">Password changed for user ID: customer_3910</p>
-                  </div>
-                  <span className="text-slate-500">23:45</span>
-                </div>
-                <div className="flex justify-between items-start border-b border-slate-900 pb-2.5">
-                  <div>
-                    <span className="text-indigo-400 font-medium">[ADMIN]</span>
-                    <p className="text-slate-300 mt-0.5">Role promotion: staff_danielle granted ROLE_STAFF</p>
-                  </div>
-                  <span className="text-slate-500">22:04</span>
-                </div>
+                {data.auditLogs.length === 0 ? (
+                  <div className="text-slate-500 text-center py-8">No security logs recorded yet.</div>
+                ) : (
+                  data.auditLogs.map((log: any) => {
+                    const date = new Date(log.createdAt);
+                    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    return (
+                      <div key={log.id} className="flex justify-between items-start border-b border-slate-900 pb-2.5">
+                        <div>
+                          <span className="text-indigo-400 font-medium">[{log.targetTable.toUpperCase()}]</span>
+                          <p className="text-slate-300 mt-0.5">{log.action} by {log.username}</p>
+                        </div>
+                        <span className="text-slate-500">{timeStr}</span>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
             
@@ -217,11 +240,11 @@ export default function DashboardPage() {
               <Database size={16} className="text-blue-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">99.98%</p>
-              <p className="text-xs text-slate-400">Postgres / Redis uptime</p>
+              <p className="text-2xl font-bold">{data.dbStatus === 'healthy' ? 'ACTIVE' : 'OFFLINE'}</p>
+              <p className="text-xs text-slate-400">Database Connection</p>
             </div>
             <div className="text-[11px] text-blue-400 flex items-center gap-1">
-              <span>●</span> Latency: 12ms avg
+              <span>●</span> Postgres healthcheck
             </div>
           </div>
 
@@ -232,12 +255,12 @@ export default function DashboardPage() {
               <Users size={16} className="text-indigo-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">186</p>
+              <p className="text-2xl font-bold">{data.users.totalRegistered}</p>
               <p className="text-xs text-slate-400">Registered users</p>
             </div>
-            <div className="text-[11px] text-slate-500 flex justify-between">
-              <span>3 Admins</span>
-              <span>24 Staff</span>
+            <div className="text-[11px] text-slate-500 flex justify-between w-full">
+              <span>{data.users.admins} Admins</span>
+              <span>{data.users.staff} Staff</span>
             </div>
           </div>
 

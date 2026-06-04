@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'drift_database.g.dart';
 
@@ -46,6 +47,33 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  // LocalProducts Queries
+  Future<List<LocalProduct>> getAllProducts() => select(localProducts).get();
+  Future<void> cacheProducts(List<LocalProduct> products) async {
+    await batch((b) {
+      b.insertAll(localProducts, products, mode: InsertMode.insertOrReplace);
+    });
+  }
+  Future<LocalProduct?> getProductBySku(String sku) =>
+      (select(localProducts)..where((tbl) => tbl.sku.equals(sku))).getSingleOrNull();
+
+  // LocalCartItems Queries
+  Future<List<LocalCartItem>> getCartItems() => select(localCartItems).get();
+  Future<int> addCartItem(LocalCartItemsCompanion item) => into(localCartItems).insert(item);
+  Future<void> updateCartItemQuantity(String productId, int qty) async {
+    await (update(localCartItems)..where((tbl) => tbl.productId.equals(productId)))
+        .write(LocalCartItemsCompanion(quantity: Value(qty)));
+  }
+  Future<void> removeCartItem(String productId) async {
+    await (delete(localCartItems)..where((tbl) => tbl.productId.equals(productId))).go();
+  }
+  Future<void> clearCart() => delete(localCartItems).go();
+
+  // SyncQueue Queries
+  Future<List<SyncQueueData>> getSyncQueue() => select(syncQueue).get();
+  Future<int> enqueueSync(SyncQueueCompanion entry) => into(syncQueue).insert(entry);
+  Future<void> deleteSync(int id) => (delete(syncQueue)..where((tbl) => tbl.id.equals(id))).go();
 }
 
 LazyDatabase _openConnection() {
@@ -55,3 +83,10 @@ LazyDatabase _openConnection() {
     return NativeDatabase.createInBackground(file);
   });
 }
+
+// Riverpod Provider
+final databaseProvider = Provider<AppDatabase>((ref) {
+  final db = AppDatabase();
+  ref.onDispose(db.close);
+  return db;
+});

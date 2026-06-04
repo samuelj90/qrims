@@ -1,30 +1,35 @@
-import 'package:flutter/material';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../controllers/cart_controller.dart';
-import '../../auth/presentation/controllers/auth_controller.dart';
 import '../../../../core/services/print_service.dart';
 import '../../domain/models/cart_item.dart';
 
 class CartHomeScreen extends ConsumerWidget {
   const CartHomeScreen({super.key});
 
-  // Mock function representing scanned QR codes (AES decrypted payloads)
+  // Mock function representing scanned QR codes (Decrypted SKU payloads)
   void _simulateScan(BuildContext context, WidgetRef ref) {
-    // Legacy scan format: ID:Name:Price:Discount:Tax:Compliment
-    const mockPayloads = [
-      '101:Colgate Toothpaste:45.0:2.0:1.5:Free toothbrush inside!',
-      '102:Oreo Biscuits:25.0:0.0:1.0:Buy 2 get 1 promotion!',
-      '103:Pure Olive Oil:180.0:10.0:8.0:10% holiday discount included'
+    const mockSkus = [
+      'PROD-001',
+      'PROD-002',
+      'PROD-003',
+      'PROD-004',
+      'PROD-005',
+      'PROD-006',
+      'PROD-007',
+      'PROD-008',
+      'PROD-009',
+      'PROD-010',
     ];
 
-    // Pick a random mock scanned product to add to the cart
-    final randomPayload = (mockPayloads..shuffle()).first;
-    ref.read(cartProvider.notifier).addScannedItem(randomPayload);
+    // Pick a random mock scanned product SKU to add to the cart
+    final randomSku = (mockSkus..shuffle()).first;
+    ref.read(cartProvider.notifier).addScannedItem(randomSku);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Scanned: ${randomPayload.split(':')[1]}'),
+        content: Text('Scanned SKU: $randomSku'),
         duration: const Duration(seconds: 1),
       ),
     );
@@ -89,10 +94,16 @@ class CartHomeScreen extends ConsumerWidget {
                               ),
                             );
 
+                            const storage = FlutterSecureStorage();
+                            final name = await storage.read(key: 'supermarket_name') ?? 'QRBS Supermarket';
+                            final address = await storage.read(key: 'supermarket_address') ?? '123052/Street, City';
+
                             final success = await PrintService.printReceipt(
                               printerIp: printer.ip,
                               items: items,
                               total: total,
+                              supermarketName: name,
+                              supermarketAddress: address,
                             );
 
                             if (context.mounted) {
@@ -128,7 +139,6 @@ class CartHomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cartState = ref.watch(cartStateProvider(ref));
     final cart = ref.watch(cartProvider);
 
     return Scaffold(
@@ -271,7 +281,7 @@ class CartHomeScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.between,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
                               'Grand Total:',
@@ -316,9 +326,11 @@ class CartHomeScreen extends ConsumerWidget {
                         ElevatedButton(
                           onPressed: cart.isSubmitting
                               ? null
-                              : () => ref
-                                  .read(cartProvider.notifier)
-                                  .checkout('192.168.1.12'), // uses gateway IP from state
+                              : () async {
+                                  const storage = FlutterSecureStorage();
+                                  final ip = await storage.read(key: 'server_ip') ?? '192.168.1.12';
+                                  ref.read(cartProvider.notifier).checkout(ip);
+                                },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             backgroundColor: Theme.of(context).colorScheme.primary,

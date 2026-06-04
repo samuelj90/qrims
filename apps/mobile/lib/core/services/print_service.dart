@@ -46,7 +46,7 @@ class PrintService {
       final host = '$subnet.$i';
       futures.add(
         Socket.connect(host, defaultEscPosPort, timeout: const Duration(milliseconds: 300))
-            .then((socket) {
+            .then<DiscoveredPrinter?>((socket) {
           socket.destroy();
           return DiscoveredPrinter(ip: host, port: defaultEscPosPort);
         }).catchError((_) => null),
@@ -80,8 +80,6 @@ class PrintService {
       final Uint8List escFeed = Uint8List.fromList([0x0A]);            // Feed line
       final Uint8List escCut = Uint8List.fromList([0x1D, 0x56, 0x41, 0x03]); // Paper Cut
 
-      final buffer = StringBuffer();
-      
       // Print Header
       socket.add(escInit);
       socket.add(escCenter);

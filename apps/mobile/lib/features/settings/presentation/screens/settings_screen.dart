@@ -1,5 +1,6 @@
-import 'package:flutter/material';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -10,10 +11,33 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController(text: 'QRBS Supermarket');
-  final _addressController = TextEditingController(text: '123052/Street, City');
-  final _phoneController = TextEditingController(text: '944858585858');
-  final _ipController = TextEditingController(text: '192.168.1.12');
+  final _storage = const FlutterSecureStorage();
+  final _nameController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _ipController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final name = await _storage.read(key: 'supermarket_name') ?? 'QRBS Supermarket';
+    final address = await _storage.read(key: 'supermarket_address') ?? '123052/Street, City';
+    final phone = await _storage.read(key: 'supermarket_phone') ?? '944858585858';
+    final ip = await _storage.read(key: 'server_ip') ?? '192.168.1.12';
+
+    if (mounted) {
+      setState(() {
+        _nameController.text = name;
+        _addressController.text = address;
+        _phoneController.text = phone;
+        _ipController.text = ip;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -24,13 +48,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Settings saved successfully (Drift SQLite updated)'),
-        ),
-      );
+      await _storage.write(key: 'supermarket_name', value: _nameController.text.trim());
+      await _storage.write(key: 'supermarket_address', value: _addressController.text.trim());
+      await _storage.write(key: 'supermarket_phone', value: _phoneController.text.trim());
+      await _storage.write(key: 'server_ip', value: _ipController.text.trim());
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Settings saved successfully (Drift SQLite & Local Storage updated)'),
+          ),
+        );
+      }
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 import '../../domain/models/user.dart';
+import '../../../../core/services/sync_service.dart';
 
 class AuthState {
   final User? user;
@@ -28,10 +29,11 @@ class AuthState {
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
+  final Ref _ref;
   final _storage = const FlutterSecureStorage();
   final _dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5)));
 
-  AuthNotifier() : super(const AuthState()) {
+  AuthNotifier(this._ref) : super(const AuthState()) {
     _loadPersistedUser();
   }
 
@@ -61,13 +63,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final token = data['accessToken'] as String;
         final user = User.fromJson(data, token);
 
-        // Persist token in secure storage
+        // Persist token & server IP in secure storage
         await _storage.write(key: 'jwt_token', value: token);
         await _storage.write(key: 'user_id', value: user.id);
         await _storage.write(key: 'username', value: user.username);
         await _storage.write(key: 'role', value: user.role);
+        await _storage.write(key: 'server_ip', value: serverIp);
 
         state = AuthState(user: user);
+
+        // Proactively pull the latest product catalog from the backend
+        _ref.read(syncServiceProvider).downloadCatalog();
+
         return true;
       } else {
         state = state.copyWith(errorMessage: 'Invalid credentials');
@@ -84,10 +91,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _storage.delete(key: 'user_id');
     await _storage.delete(key: 'username');
     await _storage.delete(key: 'role');
+    await _storage.delete(key: 'server_ip');
     state = const AuthState();
   }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier();
+  return AuthNotifier(ref);
 });

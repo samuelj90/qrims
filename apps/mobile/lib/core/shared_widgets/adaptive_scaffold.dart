@@ -1,4 +1,4 @@
-import 'package:flutter/material';
+import 'package:flutter/material.dart';
 
 class AdaptiveScaffold extends StatelessWidget {
   final Widget body;
