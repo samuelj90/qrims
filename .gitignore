@@ -1,20 +1,43 @@
-# built application files
-*.apk
-*.ap_
+# Dependency directories
+node_modules/
+jspm_packages/
+web_modules/
 
-# files for the dex VM
-*.dex
+# Next.js build output and caches
+.next/
+out/
+.vercel
 
-# Java class files
-*.class
+# NestJS build output
+dist/
+build/
 
-# generated files
-bin/
-gen/
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
 
-# Local configuration file (sdk path, etc)
-local.properties
+# Database migration / SQlite local files
+*.db
+*.db-journal
 
-# Eclipse project files
-.classpath
-.project
+# Flutter build outputs
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db

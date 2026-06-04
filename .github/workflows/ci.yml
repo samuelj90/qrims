@@ -41,6 +41,14 @@ jobs:
           cd apps/backend
           npm run build
 
+      - name: Deploy Preview API to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_BACKEND }}
+          working-directory: apps/backend
+
   web-test:
     name: Next.js Web Portal CI
     runs-on: ubuntu-latest
@@ -69,6 +77,14 @@ jobs:
         run: |
           cd apps/web
           npm run build
+
+      - name: Deploy Preview Web Console to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WEB }}
+          working-directory: apps/web
 
   mobile-test:
     name: Flutter Mobile CI
