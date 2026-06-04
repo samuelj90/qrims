@@ -1,127 +1,130 @@
+# QR Inventory Management System (QRIMS)
 
-# QrimsAndroid
+QRIMS is a modern, enterprise-grade, cross-platform ecosystem designed to replace legacy scanning systems. It provides a highly maintainable, scalable, offline-first solution built with a containerized modular architecture.
 
-QrimsAndroid is an Android application designed for product catalog management with added cart functionality, wishlist management, and a comprehensive checkout experience.This app has been enhanced to meet enterprise standards, with a modular, scalable architecture and robust features like user authentication, real-time updates, and secure payment integration.
+---
 
-## Table of Contents
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Setup and Installation](#setup-and-installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+## 🛠️ Technology Stack
 
-## Features
+1. **Backend API**: [NestJS](https://nestjs.com/) (Modular Monolith) + [Prisma ORM](https://www.prisma.io/) + [PostgreSQL](https://www.postgresql.org/)
+2. **Web Portal**: [Next.js 14](https://nextjs.org/) (App Router) + [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
+3. **Mobile Client**: [Flutter](https://flutter.dev/) (iOS, Android, Tablets, Foldables) + [Riverpod](https://riverpod.dev/) + [Drift SQLite Cache](https://drift.simonbinder.eu/)
 
-- **User Authentication**: Secure login and signup using Firebase Authentication (OAuth2 support available).
-- **Product Catalog**: Displays a detailed list of products with search, filter, and sorting options.
-- **Cart Management**: Add, update, and remove items from the cart, with total cost calculation.
-- **Wishlist**: Save favorite products for future viewing and easy access.
-- **Order Management**: Track placed orders, view order history, and get real-time updates.
-- **Checkout Process**: Secure payment integration with Stripe.
-- **Push Notifications**: Receive order status and special offers.
-- **Offline Mode**: Local caching with Room Database for offline access.
+---
 
-## Getting Started
+## 📂 Project Structure
 
-To get the app up and running on your local development environment:
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/samuelj90/QrimsAndroid.git
-   cd QrimsAndroid
-   ```
-
-2. **Setup Firebase**:
-   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).
-   - Download the `google-services.json` file and place it in the `app/` directory.
-   - Enable Firebase Authentication and Firestore Database for storing cart, wishlist, and order data.
-
-3. **Stripe Configuration**:
-   - Register your app with [Stripe](https://stripe.com/docs/api) to obtain API keys.
-   - Set up the Stripe SDK by following the instructions on [Stripe's Android documentation](https://stripe.com/docs/payments/accept-a-payment).
-
-4. **Build and Run**:
-   - Open the project in Android Studio, sync Gradle, and run the app on an emulator or physical device.
-
-## Architecture
-
-QrimsAndroid follows the **MVVM (Model-View-ViewModel)** architecture with a clean separation of concerns:
-
-- **Data Layer**: Handles data storage and retrieval with Room and Firebase, along with repository patterns.
-- **Domain Layer**: Contains use cases that orchestrate complex logic and interactions between data sources.
-- **Presentation Layer**: Uses Jetpack Compose and Android ViewModel for responsive and interactive UI.
-
-The architecture ensures scalability and maintainability, making it ideal for enterprise-level applications.
-
-## Tech Stack
-
-- **Programming Language**: Kotlin
-- **UI Framework**: Jetpack Compose
-- **Network**: Retrofit, Firebase Firestore
-- **Database**: Room Database for offline caching
-- **Authentication**: Firebase Authentication
-- **Payment**: Stripe SDK
-- **Push Notifications**: Firebase Cloud Messaging (FCM)
-
-## Setup and Installation
-
-1. **Install Android Studio** (v4.0 or later) and Java JDK 8 or later.
-2. **Sync Gradle** and ensure all dependencies are installed.
-
-**Environment Configuration**: Place sensitive keys (like Stripe API keys) in environment-specific configuration files.
-
-### Dependencies
-Add these dependencies to `build.gradle`:
-
-```gradle
-// Firebase
-implementation "com.google.firebase:firebase-auth"
-implementation "com.google.firebase:firebase-firestore"
-implementation "com.google.firebase:firebase-messaging"
-
-// Stripe
-implementation 'com.stripe:stripe-android:20.7.0'
-
-// Jetpack Compose
-implementation "androidx.compose.ui:ui"
-implementation "androidx.compose.material:material"
+```
+├── apps/
+│   ├── backend/        # NestJS API Layer (JWT security, Prisma ORM database clients)
+│   ├── web/            # Next.js 14 Admin Panel (Bento Grid operations console)
+│   └── mobile/         # Flutter responsive client app (Drift offline-first sync cache)
+├── .github/
+│   └── workflows/      # GitHub Actions CI quality gate pipeline config
+├── docker-compose.yml  # Docker multi-container services definition
+└── start-debug.sh      # Developer local debug orchestration script
 ```
 
-## Usage
+---
 
-### Authentication
+## 🚀 Getting Started
 
-- Sign up and log in using Firebase Authentication.
-- After authentication, access the product catalog, cart, and wishlist.
+### Prerequisites
+* Docker & Docker Compose
+* Node.js v18+
+* Flutter SDK (3.16.x+)
 
-### Product Catalog
+### Option A: Local Developer Debug Stack
+To start the database containers, run schema migrations, generate prisma bindings, and launch the backend and frontend services in watcher/debug mode, run:
+```bash
+./start-debug.sh
+```
 
-- Browse and search for products.
-- Use filters and sorting for a personalized experience.
+### Option B: Production Container Deployment
+To boot the production build using Docker Compose:
+```bash
+docker compose up --build -d
+```
 
-### Cart and Checkout
+---
 
-- Add items to the cart, adjust quantities, and proceed to checkout.
-- Securely pay through Stripe integration.
+## 🛡️ Security & CVE Remediation Guide
 
-### Wishlist
+This guide details how to identify, patch, and remediate Common Vulnerabilities and Exposures (CVEs) across the frontend, backend, and container images.
 
-- Add favorite products to the wishlist for easy access and future purchases.
+### 1. Node.js Dependency Vulnerabilities (NestJS / Next.js)
+Node.js dependencies can contain security alerts. To patch them:
 
-## Contributing
+* **Step 1: Check for vulnerabilities**
+  Go into either `apps/backend/` or `apps/web/` and run:
+  ```bash
+  npm audit
+  ```
+* **Step 2: Automate patching**
+  Apply automatic safe patches:
+  ```bash
+  npm audit fix
+  ```
+* **Step 3: Force upgrade breaking packages**
+  For vulnerabilities that require major upgrades (breaking changes):
+  ```bash
+  npm audit fix --force
+  ```
+* **Step 4: Manual overrides (Overriding transitive dependencies)**
+  If a nested dependency contains a CVE and the parent package has not updated its package.json, override it in your parent `package.json`:
+  ```json
+  "overrides": {
+    "flawed-transitive-package": "^2.1.4"
+  }
+}
+  ```
+  Then run `npm install`.
 
-We welcome contributions to enhance QrimsAndroid. Here’s how you can contribute:
+---
 
-1. **Fork the Repository**.
-2. **Create a Feature Branch** (`feature/your-feature-name`).
-3. **Commit and Push** your changes.
-4. **Create a Pull Request** with a detailed description of your changes.
+### 2. Docker Container Vulnerabilities
+Ecosystem Docker images utilize minimal `alpine` nodes to keep attack surfaces low. To scan and resolve container CVEs:
 
-Please review the `CONTRIBUTING.md` file for more guidelines.
+* **Step 1: Run vulnerability scans**
+  Scan images using [Trivy](https://github.com/aquasecurity/trivy) or [Snyk](https://snyk.io/):
+  ```bash
+  trivy image qrims-backend:latest
+  # Or using Docker's native scanner:
+  docker scout cves qrims-backend:latest
+  ```
+* **Step 2: Update base images**
+  Most container vulnerabilities are resolved by updating the base OS packages. Update the Dockerfile stages to include the latest minor package security patches:
+  ```dockerfile
+  FROM node:18-alpine AS builder
+  # Add updates to patch OS-level libraries:
+  RUN apk update && apk upgrade
+  ```
+* **Step 3: Rebuild without cache**
+  ```bash
+  docker compose build --no-cache
+  ```
 
-## License
+---
 
-QrimsAndroid is licensed under the [MIT License](LICENSE). See `LICENSE` for more details.
+### 3. Flutter / Dart Package Security
+Ensure Flutter packages are secure by keeping dependencies current:
+
+* **Check for updates**:
+  ```bash
+  cd apps/mobile
+  flutter pub outdated
+  ```
+* **Perform upgrades**:
+  ```bash
+  # Upgrade all packages within version constraints:
+  flutter pub upgrade
+  # Upgrade packages to major versions (resolving major CVEs):
+  flutter pub upgrade --major-versions
+  ```
+
+---
+
+### 4. CI/CD Automated Patching
+To ensure vulnerabilities are caught and patched automatically before they hit production:
+1. **GitHub Dependabot**: Enable Dependabot alerts in this repository. Ensure a `.github/dependabot.yml` exists to auto-submit PRs when dependencies contain CVE warnings.
+2. **CI Gates**: The project `.github/workflows/ci.yml` pipeline compiles all applications on every pull request, ensuring security patches do not break builds.
