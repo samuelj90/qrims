@@ -22,7 +22,8 @@ QRIMS is a modern, enterprise-grade, cross-platform ecosystem designed to replac
 ├── .github/
 │   └── workflows/      # GitHub Actions CI quality gate pipeline config
 ├── docker-compose.yml  # Docker multi-container services definition
-└── start-debug.sh      # Developer local debug orchestration script
+├── start-debug.sh      # Developer local debug orchestration script
+└── build-prod.sh       # Production builds compiler script
 ```
 
 ---
@@ -40,7 +41,17 @@ To start the database containers, run schema migrations, generate prisma binding
 ./start-debug.sh
 ```
 
-### Option B: Production Container Deployment
+### Option B: Compiling Production Builds
+To run compiled builds natively (NestJS JS output, Next.js standalone static files, and Flutter Android Release APK/AAB) or bundle the docker containers, run:
+```bash
+./build-prod.sh
+```
+
+* **Backend Output**: `apps/backend/dist/`
+* **Web Output**: `apps/web/.next/`
+* **Mobile APK Output**: `apps/mobile/build/app/outputs/flutter-apk/app-release.apk`
+
+### Option C: Production Container Deployment
 To boot the production build using Docker Compose:
 ```bash
 docker compose up --build -d
