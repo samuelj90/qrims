@@ -59,6 +59,26 @@ docker compose up --build -d
 
 ---
 
+## 📱 Mobile Architecture & Caching
+
+The Flutter application (`apps/mobile`) features a responsive layout designed for iOS/Android phones, tablets, and larger form factors:
+1. **Adaptive Navigation**: Swaps between a Bottom Navigation Bar (on phones), Navigation Rail (on tablets), and full Navigation Sidebar (on desktops).
+2. **Local Caching (Drift SQLite)**: Uses a secure, local embedded SQLite database (`drift_database.dart`) containing:
+   * `LocalProducts`: Caches the catalog for offline validation.
+   * `LocalCartItems`: Tracks cart states to protect data during connection losses.
+   * `SyncQueue`: Enqueues checkout payloads during offline states to sync them back once a connection is restored.
+
+---
+
+## 🖨️ Wi-Fi Billing & Printing System
+
+The Flutter application integrates a raw network printing engine (`print_service.dart`) to scan and print receipts on thermal receipt printers over the local network:
+1. **Wi-Fi Subnet Scanning**: Probes IP addresses concurrently on the local subnet for port `9100` (the industry standard port for raw network printing).
+2. **Raw ESC/POS Commands**: Establishes a direct TCP socket connection and pushes raw printer byte sequences (e.g., paper cutting, alignment centering, and formatting) to automatically generate receipts.
+3. **Usage**: Tap the **DISCOVER & PRINT BILL** button on the checkout screen to scan the network, choose a discovered printer, and print the bill.
+
+---
+
 ## 🛡️ Security & CVE Remediation Guide
 
 This guide details how to identify, patch, and remediate Common Vulnerabilities and Exposures (CVEs) across the frontend, backend, and container images.
