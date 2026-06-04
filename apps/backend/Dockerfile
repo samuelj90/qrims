@@ -2,6 +2,8 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 
+ARG NODE_TLS_REJECT_UNAUTHORIZED
+
 COPY apps/backend/package*.json ./apps/backend/
 COPY apps/backend/prisma ./apps/backend/prisma/
 
