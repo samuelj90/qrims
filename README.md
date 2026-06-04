@@ -22,8 +22,8 @@ QRIMS is a modern, enterprise-grade, cross-platform ecosystem designed to replac
 ├── .github/
 │   └── workflows/      # GitHub Actions CI quality gate pipeline config
 ├── docker-compose.yml  # Docker multi-container services definition
-├── start-debug.sh      # Developer local debug orchestration script
-└── build-prod.sh       # Production builds compiler script
+└── scripts/            # Cross-platform developer orchestration utility scripts
+    └── build-debug-mobile.sh / .bat # Mobile debug build compiler script
 ```
 
 ---
@@ -35,27 +35,39 @@ QRIMS is a modern, enterprise-grade, cross-platform ecosystem designed to replac
 * Node.js v18+
 * Flutter SDK (3.16.x+)
 
-### Option A: Local Developer Debug Stack
-To start the database containers, run schema migrations, generate prisma bindings, and launch the backend and frontend services in watcher/debug mode, run:
+### Syncing Configurations
+Before building or running any component, synchronize the settings from the root configuration:
 ```bash
-./start-debug.sh
+node sync_config.js
 ```
 
-### Option B: Compiling Production Builds
-To run compiled builds natively (NestJS JS output, Next.js standalone static files, and Flutter Android Release APK/AAB) or bundle the docker containers, run:
+### Option A: Local Developer Stack (Docker Compose)
+To start the database containers, run schema migrations, seed databases, and launch the backend and frontend services, run:
 ```bash
-./build-prod.sh
+docker compose up --build
+```
+* **NestJS API Service**: http://localhost:3000/api/v1
+* **Swagger Documentation**: http://localhost:3000/docs
+* **Next.js Admin Panel**: http://localhost:80 (Mapped from container port 3000)
+
+### Option B: Compiling Flutter Mobile App (Locally)
+To run or compile the Flutter mobile debug build locally:
+
+On macOS/Linux:
+```bash
+./scripts/build-debug-mobile.sh
 ```
 
-* **Backend Output**: `apps/backend/dist/`
-* **Web Output**: `apps/web/.next/`
-* **Mobile APK Output**: `apps/mobile/build/app/outputs/flutter-apk/app-release.apk`
-
-### Option C: Production Container Deployment
-To boot the production build using Docker Compose:
-```bash
-docker compose up --build -d
+On Windows:
+```cmd
+scripts\build-debug-mobile.bat
 ```
+
+### Option C: CI/CD Pipeline (Automated Debug & Prod Mobile Builds)
+On every push/pull request to `main` or `master` branches, the GitHub Actions CI pipeline compiles the Flutter application for both **Debug** and **Release/Production** targets.
+You can download the compiled APK artifacts directly from the action run:
+* **Debug APK**: `mobile-debug-apk` (Output: `app-debug.apk`)
+* **Release APK**: `mobile-release-apk` (Output: `app-release.apk`)
 
 ---
 

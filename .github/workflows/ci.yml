@@ -87,7 +87,7 @@ jobs:
           working-directory: apps/web
 
   mobile-test:
-    name: Flutter Mobile CI
+    name: Flutter Mobile CI & Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -99,12 +99,20 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.16.x'
           channel: 'stable'
           cache: true
+
+      - name: Sync Configuration
+        run: node sync_config.js
 
       - name: Install dependencies
         run: |
@@ -120,6 +128,28 @@ jobs:
         run: |
           cd apps/mobile
           flutter test
+
+      - name: Build Android Debug APK
+        run: |
+          cd apps/mobile
+          flutter build apk --debug
+
+      - name: Build Android Release APK
+        run: |
+          cd apps/mobile
+          flutter build apk --release
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mobile-debug-apk
+          path: apps/mobile/build/app/outputs/flutter-apk/app-debug.apk
+
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mobile-release-apk
+          path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
 
   docker-build-check:
     name: Docker Container Build Verification

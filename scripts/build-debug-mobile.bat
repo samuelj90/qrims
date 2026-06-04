@@ -1,4 +1,7 @@
 @echo off
+setlocal
+pushd "%~dp0.."
+
 echo ==================================================
 echo  Building Debug Mobile Apps (Android)
 echo ==================================================
@@ -6,6 +9,7 @@ echo ==================================================
 where flutter >nul 2>&1
 if %errorlevel% neq 0 (
     echo Error: Flutter SDK is not installed in the PATH.
+    popd
     exit /b 1
 )
 
@@ -33,7 +37,7 @@ call flutter build apk --debug
 echo Check if build succeeded...
 if not exist build\app\outputs\flutter-apk\app-debug.apk (
     echo Error: Mobile build failed!
-    cd ..\..
+    popd
     exit /b 1
 )
 
@@ -43,4 +47,5 @@ echo ==================================================
 echo  Mobile Debug Builds Complete!
 echo  Output: apps\mobile\build\app\outputs\flutter-apk\app-debug.apk
 echo ==================================================
-cd ..\..
+
+popd
