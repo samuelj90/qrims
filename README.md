@@ -159,3 +159,71 @@ Ensure Flutter packages are secure by keeping dependencies current:
 To ensure vulnerabilities are caught and patched automatically before they hit production:
 1. **GitHub Dependabot**: Enable Dependabot alerts in this repository. Ensure a `.github/dependabot.yml` exists to auto-submit PRs when dependencies contain CVE warnings.
 2. **CI Gates**: The project `.github/workflows/ci.yml` pipeline compiles all applications on every pull request, ensuring security patches do not break builds.
+
+---
+
+## 💾 Database Persistence & Production Migrations
+
+This guide explains how to manage PostgreSQL data persistence, execute Prisma schema migrations, and perform safe table alterations in production.
+
+### 1. Database Data Persistence (Local & Host)
+By default, `docker-compose.yml` uses a named Docker volume (`pgdata`) to persist PostgreSQL records:
+```yaml
+volumes:
+  pgdata:
+```
+To map the PostgreSQL database folder directly to a folder on your host machine (e.g., `./data/db` in the project directory), modify the `volumes` mapping for the `postgres` service in `docker-compose.yml`:
+
+1. Update the `postgres` service `volumes` section:
+   ```yaml
+   services:
+     postgres:
+       ...
+       volumes:
+         - ./data/db:/var/lib/postgresql/data
+   ```
+2. Remove the named volume declaration at the bottom of `docker-compose.yml` (since you are now using a relative host path).
+3. Ensure the `data/db` directory exists and has appropriate read/write permissions for the container database user.
+
+---
+
+### 2. How to Run Database Migrations in Production
+In production environments (like AWS ECS, Kubernetes, or standalone VM servers), **do not** run `npx prisma migrate dev` as it is interactive and attempts to recreate/reset databases if drifts are detected.
+
+Instead, execute migrations using:
+```bash
+npx prisma migrate deploy
+```
+* **What it does**: Applies all pending migrations (from your `prisma/migrations` folder) to the database without resetting any data.
+* **Best Practice**: Run this command as a post-build or pre-deployment hook in your release pipeline. In this codebase, the production `Dockerfile` entry point executes `npx prisma migrate deploy` automatically before starting the NestJS application server:
+  ```dockerfile
+  CMD ["sh", "-c", "cd apps/backend && npx prisma migrate deploy && cd ../.. && node apps/backend/dist/main"]
+  ```
+
+---
+
+### 3. Safely Altering Tables (Schema Changes) in Production
+When making schema modifications (such as adding/modifying columns, changing types, or setting constraints), follow these steps to prevent database locking, downtime, or data loss:
+
+#### Step 1: Modify the Schema Locally
+1. Edit the Prisma schema file: `apps/backend/prisma/schema.prisma`.
+2. Generate the migration file by running:
+   ```bash
+   npx prisma migrate dev --name <migration_name>
+   ```
+   * *Note: Ensure your local database is running. This creates a new directory in `apps/backend/prisma/migrations/` containing a `migration.sql` script.*
+3. Verify the generated SQL statement is correct and efficient.
+
+#### Step 2: Ensure Backward Compatibility (Expand and Contract Pattern)
+If you are changing existing columns, avoid breaking active production clients by using the **Expand-and-Contract** pattern:
+1. **Expand**: Add the new columns as optional (`?`) in the schema. Deploy this change so the database has both old and new columns.
+2. **Migrate**: Run a background data migration script (or script inside the seed/deploy task) to copy/transform data from old columns to new columns.
+3. **Contract**: Update the application code to read from the new columns. Once verified, deploy another migration to drop the old columns.
+
+#### Step 3: Deployment Pipeline
+1. Commit the `prisma/schema.prisma` and the `prisma/migrations/` folder to Git.
+2. Push your changes. The CI/CD pipeline will:
+   * Build the updated Docker images.
+   * On startup, the container will run `npx prisma migrate deploy`, updating the production tables safely.
+   * Start the new version of your application.
+
