@@ -36,3 +36,18 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WEB }}
           working-directory: apps/web
           vercel-args: '--prod'
+
+  deploy-pages:
+    name: Deploy Landing Page to GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: apps/landing-page
+          branch: gh-pages

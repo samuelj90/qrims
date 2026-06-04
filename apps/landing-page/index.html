@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRIMS - Modern QR Inventory Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header / Navigation -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <div class="logo-icon">QR</div>
+        <div class="logo-text">QRIMS<span>.</span></div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="https://github.com/samuelj90/qrims" class="btn-primary">View GitHub</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-tag">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>
+      Redesigned Operations Console
+    </div>
+    <h1>Modern QR Inventory Control <br><span class="gradient">Ecosystem</span></h1>
+    <p class="hero-desc">
+      A premium, real-time administrative platform combining high-performance NestJS backend microservices, Next.js dashboard consoles, and secure Flutter mobile terminals.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/samuelj90/qrims" class="btn-large btn-primary">
+        Get Started
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+      </a>
+      <a href="#features" class="btn-large btn-secondary">Explore Features</a>
+    </div>
+
+    <!-- Live Preview Showcase -->
+    <div class="dashboard-showcase">
+      <img src="images/dashboard_mockup.png" alt="QRIMS Operations Dashboard Mockup">
+    </div>
+  </section>
+
+  <!-- Features Section (Bento Grid) -->
+  <section id="features">
+    <div class="section-title">
+      <h2>Engineered for Scale & Speed</h2>
+      <p>A unified stack built with state-of-the-art tools for robust real-time product catalogs and operations audits.</p>
+    </div>
+
+    <div class="bento-grid">
+      <!-- Feature 1: NestJS API -->
+      <div class="bento-card col-8">
+        <div>
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <h3>High-Performance NestJS Backend API</h3>
+          <p>Built with modular NestJS architecture, fully typed TS compiler checks, and database-agnostic Prisma ORM. Serves sub-millisecond REST and GraphQL endpoints with global caching.</p>
+        </div>
+      </div>
+
+      <!-- Feature 2: Redis Caching -->
+      <div class="bento-card col-4">
+        <div>
+          <div class="card-icon cyan-theme">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2.5 3.19-2.5 5.5h20c0-2.31-1-4.24-2.5-5.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z"/></svg>
+          </div>
+          <h3>Redis Latency Optimization</h3>
+          <p>In-memory cache layers dramatically lower database load and keep live telemetry response times under 15ms.</p>
+        </div>
+      </div>
+
+      <!-- Feature 3: Next.js Dashboard -->
+      <div class="bento-card col-4">
+        <div>
+          <div class="card-icon purple-theme">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3V3z"/><path d="M21 9H3M9 21V9"/></svg>
+          </div>
+          <h3>Next.js 14 Web Panel</h3>
+          <p>Beautiful client console featuring lightning-fast Server Components, static page optimization, and a highly responsive Tailwind CSS layout.</p>
+        </div>
+      </div>
+
+      <!-- Feature 4: Flutter Scanning -->
+      <div class="bento-card col-8">
+        <div>
+          <div class="card-icon emerald-theme">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+          </div>
+          <h3>Flutter Mobile Terminals</h3>
+          <p>Cross-platform mobile client with hardware QR code scanning integration. Out-of-the-box local storage SQLite syncing that pushes queue events back to backend microservices seamlessly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Deep Dive 1: Real-time Audits -->
+  <section class="deep-dive" id="architecture">
+    <div class="deep-dive-content">
+      <span class="tag-small">Operations Telemetry</span>
+      <h3>Live Operations & Auditing Console</h3>
+      <p>
+        Stay on top of system state with built-in RBAC auditing. Every database sync, authorization state update, and device check-in is logged automatically.
+      </p>
+      <ul class="feature-list">
+        <li>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+          Real-time terminal synchronizations showing device network states.
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+          Detailed roles logs documenting staff and admin privilege promotions.
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+          Immediate security warnings for revoked authorization tokens.
+        </li>
+      </ul>
+    </div>
+
+    <div class="deep-dive-visual">
+      <div class="audit-log-container">
+        <div class="audit-row">
+          <span><span class="audit-tag tag-sys">[SYS]</span> Flush Sync Queue for terminal #F41A</span>
+          <span>00:08</span>
+        </div>
+        <div class="audit-row">
+          <span><span class="audit-tag tag-sec">[SEC]</span> Token revoked for user ID: customer_3910</span>
+          <span>23:45</span>
+        </div>
+        <div class="audit-row">
+          <span><span class="audit-tag tag-adm">[ADM]</span> Danielle promoted to ROLE_STAFF</span>
+          <span>22:04</span>
+        </div>
+        <div class="audit-row">
+          <span><span class="audit-tag tag-sys">[SYS]</span> DB Connection pool refreshed (Healthy)</span>
+          <span>20:12</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Deep Dive 2: Microservices Stack -->
+  <section class="deep-dive reverse" id="security">
+    <div class="deep-dive-content">
+      <span class="tag-small cyan-text">Infrastructure</span>
+      <h3>Secured and Containerized Architecture</h3>
+      <p>
+        The entire ecosystem compiles into modular production-grade Docker containers, linking services securely under dedicated bridge networks.
+      </p>
+      <ul class="feature-list">
+        <li>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+          High-strength PBKDF2 + AES-GCM local QR encryption keys.
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+          Secure PostgreSQL storage backed up with persistent Docker volumes.
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+          Multi-stage building pipelines for slim alpine deployment images.
+        </li>
+      </ul>
+    </div>
+
+    <div class="deep-dive-visual">
+      <div class="arch-flow">
+        <div class="arch-node">Next.js Web Console</div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-node highlighted">NestJS API Layer</div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-node">PostgreSQL + Redis Cache</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Box -->
+  <section class="cta-section">
+    <div class="cta-box">
+      <h2>Supercharge Your Inventory Catalog</h2>
+      <p>Get started with our lightweight, performant, and fully dockerized stack today.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/samuelj90/qrims" class="btn-large btn-primary">
+          View Repository on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <a href="#" class="logo">
+        <div class="logo-icon">QR</div>
+        <div class="logo-text">QRIMS<span>.</span></div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#security">Security</a></li>
+      </ul>
+    </div>
+    <p class="footer-copyright">&copy; 2026 QRIMS Ecosystem. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
