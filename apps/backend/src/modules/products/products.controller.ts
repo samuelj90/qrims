@@ -1,10 +1,35 @@
-import { Controller, Get, UseGuards, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, NotFoundException, ConflictException } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+
+export class CreateProductDto {
+  @IsString()
+  @IsNotEmpty()
+  sku: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+
+  @IsNumber()
+  @IsOptional()
+  discount?: number;
+
+  @IsNumber()
+  @IsOptional()
+  tax?: number;
+
+  @IsString()
+  @IsOptional()
+  compliment?: string;
+}
 
 @ApiTags('Products')
-@ApiBearerAuth()
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
@@ -23,5 +48,15 @@ export class ProductsController {
       throw new NotFoundException(`Product with SKU ${sku} not found`);
     }
     return product;
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new product' })
+  async create(@Body() dto: CreateProductDto) {
+    const existing = await this.productsService.findBySku(dto.sku);
+    if (existing) {
+      throw new ConflictException(`Product with SKU ${dto.sku} already exists`);
+    }
+    return this.productsService.create(dto);
   }
 }

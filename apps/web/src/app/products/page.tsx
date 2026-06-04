@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShoppingBag, QrCode, Tag, Sparkles } from 'lucide-react';
+import AddProductModal from '../components/AddProductModal';
 
 async function getProducts() {
   const apiBaseUrl = process.env.API_URL || 'http://localhost:3000';
@@ -27,10 +28,7 @@ export default async function ProductsPage() {
           <p className="text-sm text-slate-400">Inventory control catalog and scan-testable QR code payloads</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-slate-100 rounded-lg text-sm font-semibold transition-colors shadow-lg shadow-indigo-950/20">
-            <ShoppingBag size={16} />
-            Create Product
-          </button>
+          <AddProductModal />
         </div>
       </header>
 
