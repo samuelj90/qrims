@@ -42,53 +42,7 @@ export default async function DashboardPage() {
   }).format(data.sales.totalAmount);
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-screen overflow-hidden">
-      {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-8">
-            <img src="/logo.svg" alt="QRIMS Logo" className="w-10 h-10 object-contain" />
-            <div>
-              <h1 className="font-semibold text-lg leading-tight">QRIMS Platform</h1>
-              <span className="text-xs text-slate-500">v2.0 Redesign</span>
-            </div>
-          </div>
-          
-          <nav className="space-y-1.5">
-            <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-950 text-indigo-200 border border-indigo-900/50 text-sm font-medium">
-              <Activity size={18} />
-              Dashboard
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-100 text-sm font-medium transition-colors">
-              <Users size={18} />
-              User Management
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-100 text-sm font-medium transition-colors">
-              <QrCode size={18} />
-              Product QR Catalog
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-100 text-sm font-medium transition-colors">
-              <ShieldAlert size={18} />
-              Security Audits
-            </a>
-          </nav>
-        </div>
-
-        <div className="border-t border-slate-800 pt-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-300">
-              AD
-            </div>
-            <div>
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-slate-500">admin@qrims.com</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-slate-950 p-8">
+    <main className="flex-1 overflow-y-auto bg-slate-950 p-8">
         <header className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-bold text-slate-50">Operations Console</h2>
@@ -266,6 +220,5 @@ export default async function DashboardPage() {
 
         </div>
       </main>
-    </div>
   );
 }

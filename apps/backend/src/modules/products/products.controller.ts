@@ -9,14 +9,12 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get all active products' })
   async findAll() {
     return this.productsService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':sku')
   @ApiOperation({ summary: 'Get a product by SKU' })
   async findBySku(@Param('sku') sku: string) {

@@ -5,6 +5,7 @@ import { ProductsModule } from './modules/products/products.module';
 import { CartsModule } from './modules/carts/carts.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     CartsModule,
     SettingsModule,
     DashboardModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],

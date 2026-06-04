@@ -10,22 +10,23 @@ class CartHomeScreen extends ConsumerWidget {
 
   // Mock function representing scanned QR codes (Decrypted SKU payloads)
   void _simulateScan(BuildContext context, WidgetRef ref) {
-    const mockSkus = [
-      'PROD-001',
-      'PROD-002',
-      'PROD-003',
-      'PROD-004',
-      'PROD-005',
-      'PROD-006',
-      'PROD-007',
-      'PROD-008',
-      'PROD-009',
-      'PROD-010',
+    const mockPayloads = [
+      'PROD-001:Wireless Laser Mouse:29.99:0.0:5.0:Ergonomic 2.4Ghz wireless',
+      'PROD-002:Mechanical Gaming Keyboard:89.99:10.0:5.0:RGB backlit blue switches',
+      'PROD-003:27-inch 4K IPS Monitor:349.99:0.0:15.0:UHD 144Hz high refresh rate',
+      'PROD-004:USB-C Multiport Hub:45.00:5.0:2.5:8-in-1 card reader & HDMI',
+      'PROD-005:Noise Cancelling Headphones:199.99:20.0:10.0:Over-ear Bluetooth headphones',
+      'PROD-006:Ergonomic Office Chair:249.00:0.0:12.0:Mesh back lumbar support',
+      'PROD-007:Smart Fitness Watch:129.50:15.0:6.0:Heart rate & sleep tracker',
+      'PROD-008:1080p Web Camera:59.99:0.0:3.0:HD stream autofocus mic',
+      'PROD-009:External 2TB SSD:159.00:10.0:8.0:USB 3.2 gen 2 ultra speed',
+      'PROD-010:Portable Laptop Stand:35.00:0.0:1.5:Aluminum fold angle adjuster',
     ];
 
-    // Pick a random mock scanned product SKU to add to the cart
-    final randomSku = (mockSkus..shuffle()).first;
-    ref.read(cartProvider.notifier).addScannedItem(randomSku);
+    // Pick a random mock scanned product QR payload to add to the cart
+    final randomPayload = (mockPayloads..shuffle()).first;
+    final randomSku = randomPayload.split(':')[0];
+    ref.read(cartProvider.notifier).addScannedItem(randomPayload);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

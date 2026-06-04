@@ -66,8 +66,14 @@ class CartNotifier extends StateNotifier<CartState> {
 
   Future<void> addScannedItem(String skuOrPayload) async {
     try {
-      // 1. Try to look up by SKU in local database first (real seeded database data)
-      final localProd = await _db.getProductBySku(skuOrPayload);
+      // 1. Extract SKU if it's a colon-separated payload, or use the whole string
+      String sku = skuOrPayload;
+      if (skuOrPayload.contains(':')) {
+        sku = skuOrPayload.split(':')[0];
+      }
+
+      // 2. Try to look up by SKU in local database first (real seeded database data)
+      final localProd = await _db.getProductBySku(sku);
       CartItem newItem;
       
       if (localProd != null) {
@@ -104,8 +110,10 @@ class CartNotifier extends StateNotifier<CartState> {
           quantity: 1,
         ));
       }
-    } catch (e) {
-      state = state.copyWith(errorMessage: 'Product SKU not found / Invalid QR Payload');
+    } catch (e, stack) {
+      print('DEBUG SCAN ERROR: $e');
+      print('STACKTRACE: $stack');
+      state = state.copyWith(errorMessage: 'Scan Error: $e');
     }
   }
 
