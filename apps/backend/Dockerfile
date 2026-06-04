@@ -30,4 +30,4 @@ COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node apps/backend/dist/main"]
+CMD ["sh", "-c", "cd apps/backend && npx prisma migrate deploy && cd ../.. && node apps/backend/dist/main"]

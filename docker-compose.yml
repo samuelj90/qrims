@@ -38,7 +38,7 @@ services:
       args:
         NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-}
     container_name: qrims-backend
-    command: sh -c "npx prisma migrate deploy && npx prisma db seed && node apps/backend/dist/main"
+    command: sh -c "cd apps/backend && npx prisma migrate deploy && npx prisma db seed && cd ../.. && node apps/backend/dist/main"
     ports:
       - "3000:3000"
     environment:
