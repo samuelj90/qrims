@@ -1,5 +1,13 @@
 # QR Inventory Management System (QRIMS)
 
+[![CI Quality Gate](https://github.com/samuelj90/qrims/actions/workflows/ci.yml/badge.svg)](https://github.com/samuelj90/qrims/actions/workflows/ci.yml)
+[![CD Production Deployment](https://github.com/samuelj90/qrims/actions/workflows/deploy.yml/badge.svg)](https://github.com/samuelj90/qrims/actions/workflows/deploy.yml)
+![Flutter](https://img.shields.io/badge/Flutter-3.16.x-blue.svg?logo=flutter&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg?logo=node.js&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-10.x-red.svg?logo=nestjs&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-14.x-black.svg?logo=next.js&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg?logo=docker&logoColor=white)
+
 QRIMS is a modern, enterprise-grade, cross-platform ecosystem designed to replace legacy scanning systems. It provides a highly maintainable, scalable, offline-first solution built with a containerized modular architecture.
 
 ---
@@ -64,10 +72,11 @@ scripts\build-debug-mobile.bat
 ```
 
 ### Option C: CI/CD Pipeline (Automated Debug & Prod Mobile Builds)
-On every push/pull request to `main` or `master` branches, the GitHub Actions CI pipeline compiles the Flutter application for both **Debug** and **Release/Production** targets.
-You can download the compiled APK artifacts directly from the action run:
-* **Debug APK**: `mobile-debug-apk` (Output: `app-debug.apk`)
-* **Release APK**: `mobile-release-apk` (Output: `app-release.apk`)
+On every push/pull request to `main` or `master` branches, the GitHub Actions CI pipeline compiles the Flutter application for Android and iOS targets.
+You can download the compiled build artifacts directly from the action run:
+* **Android Debug APK**: `mobile-debug-apk` (Output: `app-debug.apk`)
+* **Android Release APK**: `mobile-release-apk` (Output: `app-release.apk`)
+* **iOS Debug App**: `mobile-debug-ios` (Output: `Runner.app` bundle)
 
 ---
 

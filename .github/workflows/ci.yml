@@ -88,7 +88,7 @@ jobs:
 
   mobile-test:
     name: Flutter Mobile CI & Build
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -139,6 +139,11 @@ jobs:
           cd apps/mobile
           flutter build apk --release
 
+      - name: Build iOS Debug App
+        run: |
+          cd apps/mobile
+          flutter build ios --debug --no-codesign
+
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -150,6 +155,12 @@ jobs:
         with:
           name: mobile-release-apk
           path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload iOS Debug App Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mobile-debug-ios
+          path: apps/mobile/build/ios/iphoneos/Runner.app
 
   docker-build-check:
     name: Docker Container Build Verification

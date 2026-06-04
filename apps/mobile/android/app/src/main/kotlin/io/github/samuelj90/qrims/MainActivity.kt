@@ -1,4 +1,4 @@
-package com.example.qrims_mobile
+package io.github.samuelj90.qrims
 
 import io.flutter.embedding.android.FlutterActivity
 

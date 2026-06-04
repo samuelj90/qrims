@@ -31,21 +31,41 @@ if not exist ios (
 echo --^> Fetching dependencies...
 call flutter pub get
 
-echo --^> Building Android Debug APK...
-call flutter build apk --debug
-
-echo Check if build succeeded...
-if not exist build\app\outputs\flutter-apk\app-debug.apk (
-    echo Error: Mobile build failed!
-    popd
-    exit /b 1
+:: Check for Java
+where java >nul 2>&1
+if %errorlevel% equ 0 (
+    java -version >nul 2>&1
+    if %errorlevel% neq 0 (
+        set HAS_JAVA=false
+    ) else (
+        set HAS_JAVA=true
+    )
+) else (
+    set HAS_JAVA=false
 )
 
-echo Check completed!
-echo.
-echo ==================================================
-echo  Mobile Debug Builds Complete!
-echo  Output: apps\mobile\build\app\outputs\flutter-apk\app-debug.apk
-echo ==================================================
+if "%HAS_JAVA%"=="true" (
+    echo --^> Building Android Debug APK...
+    call flutter build apk --debug
+
+    if not exist build\app\outputs\flutter-apk\app-debug.apk (
+        echo Error: Mobile build failed!
+        popd
+        exit /b 1
+    )
+
+    echo.
+    echo ==================================================
+    echo  Mobile Debug Builds Complete!
+    echo  Output: apps\mobile\build\app\outputs\flutter-apk\app-debug.apk
+    echo ==================================================
+) else (
+    echo.
+    echo ==================================================
+    echo  Warning: Java Runtime (JDK) not found.
+    echo  Android compilation requires a valid Java Runtime.
+    echo  Please install the JDK (e.g. from https://adoptium.net/).
+    echo ==================================================
+)
 
 popd

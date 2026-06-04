@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.qrims_mobile"
+    namespace = "io.github.samuelj90.qrims"
     compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.qrims_mobile"
+        applicationId = "io.github.samuelj90.qrims"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
