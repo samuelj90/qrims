@@ -4,16 +4,21 @@ on:
   push:
     branches: [ master, main ]
 
+# Cancel in-progress Pages deployments when a new push arrives
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   deploy-backend:
     name: Deploy NestJS API to Vercel
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy API Backend
-        uses: amondnet/vercel-action@v20
+        uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
@@ -26,10 +31,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy Web Client
-        uses: amondnet/vercel-action@v20
+        uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
@@ -37,17 +42,31 @@ jobs:
           working-directory: apps/web
           vercel-args: '--prod'
 
+  # ── Landing Page → GitHub Pages ────────────────────────────────────────────
   deploy-pages:
     name: Deploy Landing Page to GitHub Pages
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      pages: write        # deploy to GitHub Pages
+      id-token: write     # verify deployment is from this repo
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload landing page as Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Deploy everything inside apps/landing-page/
+          path: apps/landing-page
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: apps/landing-page
-          branch: gh-pages
+        id: deploy
+        uses: actions/deploy-pages@v4
