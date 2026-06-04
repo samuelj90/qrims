@@ -31,10 +31,10 @@ jobs:
           cd apps/backend
           npx prisma generate
 
-      - name: Run Linter
+      - name: Run ESLint Quality Check
         run: |
           cd apps/backend
-          npm run lint --if-present
+          npm run lint
 
       - name: Run TypeScript Compile check
         run: |
@@ -63,7 +63,7 @@ jobs:
       - name: Next.js Lint check
         run: |
           cd apps/web
-          npm run lint --if-present
+          npm run lint
 
       - name: Run Next.js Build
         run: |
@@ -104,3 +104,17 @@ jobs:
         run: |
           cd apps/mobile
           flutter test
+
+  docker-build-check:
+    name: Docker Container Build Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Test Build Docker Compose Stack
+        run: |
+          docker compose build
