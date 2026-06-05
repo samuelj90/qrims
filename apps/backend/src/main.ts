@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import * as http from 'http';
 
 let cachedExpressApp: any;
 
@@ -65,7 +66,6 @@ export default async (req: any, res: any) => {
 if (!process.env.VERCEL) {
   bootstrapServer().then((expressApp) => {
     const port = process.env.PORT || 3000;
-    const http = require('http');
     const server = http.createServer(expressApp);
     server.listen(port, () => {
       console.log(`QRIMS API is running locally on: http://localhost:${port}/api/v1`);

@@ -15,7 +15,8 @@ export class AuthService {
       where: { username, deletedAt: null },
     });
     if (user && (await bcrypt.compare(pass, user.passwordHash))) {
-      const { passwordHash, ...result } = user;
+      const result = { ...user };
+      delete (result as any).passwordHash;
       return result;
     }
     return null;

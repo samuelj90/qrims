@@ -26,14 +26,16 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         actions: [
           IconButton(
             color: Colors.white,
-            icon: ValueListenableBuilder(
-              valueListenable: _controller.torchState,
+            icon: ValueListenableBuilder<MobileScannerState>(
+              valueListenable: _controller,
               builder: (context, state, child) {
-                switch (state) {
+                switch (state.torchState) {
                   case TorchState.off:
                     return const Icon(Icons.flash_off_rounded);
                   case TorchState.on:
                     return const Icon(Icons.flash_on_rounded);
+                  default:
+                    return const Icon(Icons.flash_off_rounded);
                 }
               },
             ),
@@ -42,13 +44,15 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           ),
           IconButton(
             color: Colors.white,
-            icon: ValueListenableBuilder(
-              valueListenable: _controller.cameraFacingState,
+            icon: ValueListenableBuilder<MobileScannerState>(
+              valueListenable: _controller,
               builder: (context, state, child) {
-                switch (state) {
+                switch (state.cameraDirection) {
                   case CameraFacing.front:
                     return const Icon(Icons.camera_front_rounded);
                   case CameraFacing.back:
+                    return const Icon(Icons.camera_rear_rounded);
+                  default:
                     return const Icon(Icons.camera_rear_rounded);
                 }
               },

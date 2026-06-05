@@ -19,7 +19,7 @@ class PrintService {
   // Scans the local subnet for responsive receipt printers on raw port 9100
   static Stream<DiscoveredPrinter> discoverPrinters() async* {
     final connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) return;
+    if (connectivityResult.isEmpty || connectivityResult.contains(ConnectivityResult.none)) return;
 
     // Discover the base subnet (e.g., 192.168.1.xxx)
     String subnet = '192.168.1';

@@ -19,8 +19,8 @@ class SyncService {
     fetchShopSettings();
 
     // Listen to network changes
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      if (result != ConnectivityResult.none) {
+    Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+      if (results.isNotEmpty && !results.contains(ConnectivityResult.none)) {
         processOfflineQueue();
         downloadCatalog();
         fetchShopSettings();

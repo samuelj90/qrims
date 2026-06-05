@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -158,7 +159,7 @@ class CartNotifier extends StateNotifier<CartState> {
         'totalAmount': state.grandTotal,
       };
 
-      if (connectivityResult == ConnectivityResult.none) {
+      if (connectivityResult.isEmpty || connectivityResult.contains(ConnectivityResult.none)) {
         // Enqueue checkout payload into local SQLite SyncQueue table
         await _db.enqueueSync(SyncQueueCompanion.insert(
           endpoint: '/api/v1/carts/checkout',
