@@ -38,6 +38,9 @@ jobs:
         with:
           channel: 'stable'
           cache: true
+          pub-cache: true
+          pub-cache-key: "pub-cache-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}"
+          cache-key: "flutter-sdk-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}"
 
       - name: Sync Configuration
         run: node sync_config.js
