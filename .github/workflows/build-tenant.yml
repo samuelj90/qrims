@@ -1,0 +1,88 @@
+name: Multi-Tenant Mobile Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      tenant_id:
+        description: 'Tenant Identifier (used in artifact filenames, lowercase e.g., acme)'
+        required: true
+        default: 'custom'
+      app_name:
+        description: 'Application Display Name (e.g. Acme Inventory)'
+        required: true
+        default: 'QRIMS Acme'
+      api_base_url:
+        description: 'API Base URL (e.g. https://api.acme.com/api/v1)'
+        required: true
+        default: 'http://localhost:3000/api/v1'
+      cdn_base_url:
+        description: 'CDN Base URL (hosting custom branding logo.png, e.g. https://cdn.acme.com/assets)'
+        required: true
+        default: 'https://raw.githubusercontent.com/samuelj90/qrims/master'
+
+jobs:
+  build-tenant-app:
+    name: Build Tenant Mobile Apps
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Sync Tenant Configuration and Assets
+        run: node sync_config.js
+        env:
+          APP_NAME: ${{ inputs.app_name }}
+          API_BASE_URL: ${{ inputs.api_base_url }}
+          CDN_BASE_URL: ${{ inputs.cdn_base_url }}
+          ENABLE_SIMULATION_DEBUG: 'false' # Turn off simulation for custom builds
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          pub-cache: true
+          pub-cache-key: "pub-cache-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}"
+          cache-key: "flutter-sdk-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}"
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: apps/mobile
+
+      - name: Build Android Release APK
+        run: flutter build apk --release --build-number=${{ github.run_number }}
+        working-directory: apps/mobile
+
+      - name: Build iOS Release App
+        run: flutter build ios --release --no-codesign --build-number=${{ github.run_number }}
+        working-directory: apps/mobile
+
+      - name: Zip iOS Build
+        run: |
+          cd apps/mobile/build/ios/iphoneos
+          zip -r Runner.zip Runner.app
+
+      - name: Upload Android Tenant APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-${{ inputs.tenant_id }}-apk
+          path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
+
+      - name: Upload iOS Tenant App
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-${{ inputs.tenant_id }}-ios
+          path: apps/mobile/build/ios/iphoneos/Runner.zip
+          retention-days: 7

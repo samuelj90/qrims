@@ -818,3 +818,75 @@ footer {
     display: none; /* simple responsive header */
   }
 }
+
+/* ============================================================
+   Changelog Section
+   ============================================================ */
+.changelog-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+.changelog-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.changelog-body {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.changelog-body h1, .changelog-body h2, .changelog-body h3 {
+  color: var(--text-primary);
+  font-family: var(--font-title);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.changelog-body h3 {
+  font-size: 1.25rem;
+}
+
+.changelog-body ul {
+  list-style: none;
+  padding-left: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.changelog-body li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.changelog-body li::before {
+  content: "•";
+  color: var(--primary);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.changelog-body code {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+  color: #a5b4fc;
+}
+
+.changelog-body p {
+  margin-bottom: 1.25rem;
+}
+

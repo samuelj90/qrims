@@ -7,12 +7,76 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css">
   <script src="config.js"></script>
+  <script src="changelog.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const logoUrl = `${CDN_BASE_URL}/apps/web/public/logo.svg`;
       document.querySelectorAll(".logo-image").forEach(img => {
         img.src = logoUrl;
       });
+
+      // Load and render latest release changelog if available
+      if (typeof LATEST_RELEASE !== 'undefined' && LATEST_RELEASE) {
+        document.getElementById("changelog-version").textContent = LATEST_RELEASE.version;
+        
+        try {
+          const pubDate = new Date(LATEST_RELEASE.published_at);
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          document.getElementById("changelog-date").textContent = pubDate.toLocaleDateString(undefined, options);
+        } catch (e) {
+          document.getElementById("changelog-date").textContent = LATEST_RELEASE.published_at || '';
+        }
+
+        const rawBody = LATEST_RELEASE.body || '';
+        // Simple HTML escapes
+        let escaped = rawBody
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+
+        // Parse list items and paragraphs
+        const lines = escaped.split('\n');
+        let inList = false;
+        let finalHtml = '';
+        lines.forEach(line => {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+            if (!inList) {
+              finalHtml += '<ul>';
+              inList = true;
+            }
+            let itemText = trimmed.substring(2)
+              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+              .replace(/`(.*?)`/g, '<code>$1</code>');
+            finalHtml += `<li>${itemText}</li>`;
+          } else {
+            if (inList) {
+              finalHtml += '</ul>';
+              inList = false;
+            }
+            if (trimmed) {
+              let lineText = trimmed
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`(.*?)`/g, '<code>$1</code>');
+              if (lineText.startsWith('### ')) {
+                finalHtml += `<h3>${lineText.substring(4)}</h3>`;
+              } else if (lineText.startsWith('## ')) {
+                finalHtml += `<h2>${lineText.substring(3)}</h2>`;
+              } else if (lineText.startsWith('# ')) {
+                finalHtml += `<h1>${lineText.substring(2)}</h1>`;
+              } else {
+                finalHtml += `<p>${lineText}</p>`;
+              }
+            }
+          }
+        });
+        if (inList) {
+          finalHtml += '</ul>';
+        }
+
+        document.getElementById("changelog-body").innerHTML = finalHtml;
+        document.getElementById("changelog").style.display = "block";
+      }
     });
   </script>
 </head>
@@ -115,6 +179,19 @@
         </div>
       </div>
 
+    </div>
+  </section>
+
+  <!-- Changelog Section -->
+  <section id="changelog" class="changelog-section" style="display: none;">
+    <div class="section-title">
+      <h2>What's New <span class="gradient">in <span id="changelog-version"></span></span></h2>
+      <p>Released on <span id="changelog-date"></span></p>
+    </div>
+    <div class="changelog-container">
+      <div id="changelog-body" class="changelog-body">
+        <!-- Rendered changelog -->
+      </div>
     </div>
   </section>
 

@@ -73,9 +73,11 @@ jobs:
         with:
           name: mobile-release-apk
           path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
 
       - name: Upload iOS Release App Artifact
         uses: actions/upload-artifact@v4
         with:
           name: mobile-release-ios
           path: apps/mobile/build/ios/iphoneos/Runner.app
+          retention-days: 7
