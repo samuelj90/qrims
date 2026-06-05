@@ -13,6 +13,7 @@ on:
       - 'apps/mobile/**'
       - 'sync_config.js'
       - '.github/workflows/mobile-ci.yml'
+  workflow_dispatch:
 
 jobs:
   mobile-test:
