@@ -44,6 +44,8 @@ jobs:
 
       - name: Sync Configuration
         run: node sync_config.js
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
 
       - name: Install dependencies
         run: flutter pub get

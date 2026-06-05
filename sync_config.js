@@ -16,6 +16,21 @@ try {
   process.exit(1);
 }
 
+// Override using environment variables if present (useful for CI/CD)
+if (process.env.API_BASE_URL) {
+  console.log(`Overriding API_BASE_URL with environment variable: ${process.env.API_BASE_URL}`);
+  config.API_BASE_URL = process.env.API_BASE_URL;
+}
+if (process.env.CDN_BASE_URL) {
+  console.log(`Overriding CDN_BASE_URL with environment variable: ${process.env.CDN_BASE_URL}`);
+  config.CDN_BASE_URL = process.env.CDN_BASE_URL;
+}
+if (process.env.ENABLE_SIMULATION_DEBUG !== undefined) {
+  const isTrue = process.env.ENABLE_SIMULATION_DEBUG === 'true';
+  console.log(`Overriding ENABLE_SIMULATION_DEBUG with environment variable: ${isTrue}`);
+  config.ENABLE_SIMULATION_DEBUG = isTrue;
+}
+
 // Validate required fields
 const requiredKeys = ['CDN_BASE_URL', 'API_BASE_URL', 'ENABLE_SIMULATION_DEBUG'];
 for (const key of requiredKeys) {

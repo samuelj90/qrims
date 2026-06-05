@@ -27,6 +27,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Sync Configuration
+        run: node sync_config.js
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 

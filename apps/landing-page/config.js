@@ -2,7 +2,7 @@
 const CONFIG = {
   CDN_BASE_URL: "https://raw.githubusercontent.com/samuelj90/qrims/master",
   API_BASE_URL: "http://localhost:3000/api/v1",
-  ENABLE_SIMULATION_DEBUG: false
+  ENABLE_SIMULATION_DEBUG: true
 };
 
 // Global variables for ease of use
