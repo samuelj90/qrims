@@ -107,7 +107,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final token = await _storage.read(key: 'jwt_token');
       if (token == null) return false;
 
-      final baseUrl = AppConfig.enableSimulationDebug
+      const baseUrl = AppConfig.enableSimulationDebug
           ? 'http://localhost:3000/api/v1'
           : AppConfig.apiBaseUrl;
 

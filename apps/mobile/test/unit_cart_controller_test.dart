@@ -1,15 +1,11 @@
-import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:qrims_mobile/features/cart/presentation/controllers/cart_controller.dart';
-import 'package:qrims_mobile/features/cart/domain/models/cart_item.dart';
 import 'package:qrims_mobile/core/local_db/drift_database.dart';
-import 'package:qrims_mobile/core/services/sync_service.dart';
 import 'package:qrims_mobile/core/network/dio_provider.dart';
 import 'package:drift/native.dart';
-import 'package:drift/drift.dart';
 
 // Lightweight MockDio implementation
 class MockDio implements Dio {
@@ -174,7 +170,7 @@ void main() {
       addTearDown(container.dispose);
 
       await database.cacheProducts([
-        LocalProduct(
+        const LocalProduct(
           id: 'uuid-111',
           sku: 'SKU-ABC',
           name: 'Choco Cookies',

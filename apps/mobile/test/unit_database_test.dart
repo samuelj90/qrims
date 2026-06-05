@@ -1,6 +1,5 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:qrims_mobile/core/local_db/drift_database.dart';
 
 void main() {
@@ -16,7 +15,7 @@ void main() {
 
   group('LocalProducts Cache Queries', () {
     test('cacheProducts and getProductBySku/getAllProducts should work', () async {
-      final product1 = LocalProduct(
+      const product1 = LocalProduct(
         id: 'p-1',
         sku: 'SKU111',
         name: 'Milk',
@@ -25,7 +24,7 @@ void main() {
         tax: 0.10,
         isActive: true,
       );
-      final product2 = LocalProduct(
+      const product2 = LocalProduct(
         id: 'p-2',
         sku: 'SKU222',
         name: 'Bread',
