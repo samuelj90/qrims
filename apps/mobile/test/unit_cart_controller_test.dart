@@ -120,7 +120,7 @@ void main() {
       const MethodChannel('dev.fluttercommunity.plus/connectivity'),
       (MethodCall methodCall) async {
         if (methodCall.method == 'check') {
-          return currentConnectivity;
+          return [currentConnectivity];
         }
         return null;
       },
