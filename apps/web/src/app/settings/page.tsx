@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Shield, User, Lock, Camera, LogOut } from 'lucide-react';
+import { User, Lock, Camera, LogOut } from 'lucide-react';
 
 export default function SettingsPage() {
   const [profilePic, setProfilePic] = useState<string | null>(null);
@@ -56,7 +56,7 @@ export default function SettingsPage() {
       } else {
         setMessage({ type: 'error', text: 'Failed to update password. REST API unavailable.' });
       }
-    } catch (err) {
+    } catch {
       // Offline fallback success for local simulation
       setMessage({ type: 'success', text: 'Password updated (Local Simulation Mode active).' });
       setNewPassword('');

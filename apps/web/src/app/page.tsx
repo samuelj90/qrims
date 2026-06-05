@@ -4,8 +4,6 @@ import {
   Smartphone, 
   Database, 
   QrCode, 
-  ShieldAlert, 
-  Activity, 
   Users, 
   ShoppingCart,
   Zap

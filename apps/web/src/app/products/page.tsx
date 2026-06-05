@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, QrCode, Tag, Sparkles } from 'lucide-react';
+import { QrCode, Tag, Sparkles } from 'lucide-react';
 import AddProductModal from '../components/AddProductModal';
 
 async function getProducts() {
