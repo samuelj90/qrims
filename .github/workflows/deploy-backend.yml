@@ -1,0 +1,29 @@
+name: Backend CD Deployment
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'apps/backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+concurrency:
+  group: "deploy-backend"
+  cancel-in-progress: true
+
+jobs:
+  deploy-backend:
+    name: Deploy NestJS API to Vercel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy API Backend
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_BACKEND }}
+          working-directory: apps/backend
+          vercel-args: '--prod'

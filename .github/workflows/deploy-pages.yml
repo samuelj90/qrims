@@ -1,0 +1,41 @@
+name: Landing Page CD Deployment
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'apps/landing-page/**'
+      - '.github/workflows/deploy-pages.yml'
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy-pages:
+    name: Deploy Landing Page to GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write        # deploy to GitHub Pages
+      id-token: write     # verify deployment is from this repo
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload landing page as Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Deploy everything inside apps/landing-page/
+          path: apps/landing-page
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,33 @@
+name: Docker CI Build Verification
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'apps/backend/**'
+      - 'apps/web/**'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - '.github/workflows/docker-ci.yml'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'apps/backend/**'
+      - 'apps/web/**'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - '.github/workflows/docker-ci.yml'
+
+jobs:
+  docker-build-check:
+    name: Docker Container Build Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test Build Docker Compose Stack
+        run: docker compose build
