@@ -25,7 +25,7 @@ dependencies:
   # Networking & Security
   dio: ^5.4.0
   flutter_secure_storage: ^10.3.1
-  connectivity_plus: ^7.1.1
+  connectivity_plus: ^6.1.5
   
   # UI & Icons
   cupertino_icons: ^1.0.6
