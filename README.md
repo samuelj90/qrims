@@ -1,7 +1,9 @@
 # QR Inventory Management System (QRIMS)
 
-[![CI Quality Gate](https://github.com/samuelj90/qrims/actions/workflows/ci.yml/badge.svg)](https://github.com/samuelj90/qrims/actions/workflows/ci.yml)
-[![CD Production Deployment](https://github.com/samuelj90/qrims/actions/workflows/deploy.yml/badge.svg)](https://github.com/samuelj90/qrims/actions/workflows/deploy.yml)
+[![Backend CI](https://github.com/samuelj90/qrims/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/samuelj90/qrims/actions/workflows/backend-ci.yml)
+[![Web CI](https://github.com/samuelj90/qrims/actions/workflows/web-ci.yml/badge.svg)](https://github.com/samuelj90/qrims/actions/workflows/web-ci.yml)
+[![Mobile CI](https://github.com/samuelj90/qrims/actions/workflows/mobile-ci.yml/badge.svg)](https://github.com/samuelj90/qrims/actions/workflows/mobile-ci.yml)
+[![Docker CI](https://github.com/samuelj90/qrims/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/samuelj90/qrims/actions/workflows/docker-ci.yml)
 ![Flutter](https://img.shields.io/badge/Flutter-3.16.x-blue.svg?logo=flutter&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg?logo=node.js&logoColor=white)
 ![NestJS](https://img.shields.io/badge/NestJS-10.x-red.svg?logo=nestjs&logoColor=white)
@@ -125,10 +127,11 @@ Node.js dependencies can contain security alerts. To patch them:
 * **Step 4: Manual overrides (Overriding transitive dependencies)**
   If a nested dependency contains a CVE and the parent package has not updated its package.json, override it in your parent `package.json`:
   ```json
-  "overrides": {
-    "flawed-transitive-package": "^2.1.4"
+  {
+    "overrides": {
+      "flawed-transitive-package": "^2.1.4"
+    }
   }
-}
   ```
   Then run `npm install`.
 
@@ -179,7 +182,7 @@ Ensure Flutter packages are secure by keeping dependencies current:
 ### 4. CI/CD Automated Patching
 To ensure vulnerabilities are caught and patched automatically before they hit production:
 1. **GitHub Dependabot**: Enable Dependabot alerts in this repository. Ensure a `.github/dependabot.yml` exists to auto-submit PRs when dependencies contain CVE warnings.
-2. **CI Gates**: The project `.github/workflows/ci.yml` pipeline compiles all applications on every pull request, ensuring security patches do not break builds.
+2. **CI Gates**: Dedicated quality check workflows (`backend-ci.yml`, `web-ci.yml`, and `mobile-ci.yml`) automatically validate, lint, and compile each application on push and pull requests, ensuring builds remain stable.
 
 ---
 
