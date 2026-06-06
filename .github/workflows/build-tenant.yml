@@ -19,6 +19,10 @@ on:
         description: 'CDN Base URL (hosting custom branding logo.png, e.g. https://cdn.acme.com/assets)'
         required: true
         default: 'https://raw.githubusercontent.com/samuelj90/qrims/master'
+      vercel_project_id_backend:
+        description: 'Vercel Project ID for Backend API (optional, leave blank to skip deployment)'
+        required: false
+        default: ''
 
 jobs:
   build-tenant-app:
@@ -86,3 +90,13 @@ jobs:
           name: mobile-${{ inputs.tenant_id }}-ios
           path: apps/mobile/build/ios/iphoneos/Runner.zip
           retention-days: 7
+
+      - name: Deploy Tenant Backend to Vercel
+        if: ${{ inputs.vercel_project_id_backend != '' }}
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ inputs.vercel_project_id_backend }}
+          working-directory: apps/backend
+          vercel-args: '--prod'
