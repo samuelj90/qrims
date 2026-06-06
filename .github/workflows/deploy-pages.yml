@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/landing-page/**'
       - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
 
 concurrency:
   group: "pages"
