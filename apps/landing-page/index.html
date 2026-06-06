@@ -200,11 +200,11 @@
       <p class="text-lg text-slate-500 dark:text-slate-400 transition-colors duration-300">A powerful admin console for operations teams and a clean mobile terminal for store staff and shoppers.</p>
     </div>
     
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-6xl mx-auto">
+    <div class="flex flex-col lg:flex-row items-center justify-center gap-12 max-w-6xl mx-auto">
       <!-- Admin Dashboard -->
-      <div class="lg:col-span-8 flex flex-col space-y-3 w-full">
+      <div class="w-full lg:w-[65%] flex flex-col space-y-4">
         <div class="flex items-center gap-2 text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
           Admin Operations Console
         </div>
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-hidden shadow-2xl shadow-slate-950/10 dark:shadow-slate-950/60 transition-colors duration-300">
@@ -234,21 +234,19 @@
       </div>
 
       <!-- Mobile App -->
-      <div class="lg:col-span-4 flex flex-col space-y-3 items-center lg:items-start w-full">
+      <div class="w-full sm:w-auto flex flex-col space-y-4 items-center lg:items-start">
         <div class="flex items-center gap-2 text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
-          <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
           Mobile Terminal
         </div>
         <!-- Phone Mockup Frame -->
-        <div class="relative mx-auto w-64 h-[500px] border-4 border-slate-300 dark:border-slate-800 rounded-[3rem] bg-slate-100 dark:bg-slate-900 overflow-hidden shadow-2xl shadow-slate-950/10 dark:shadow-slate-950/60 flex flex-col transition-colors duration-300">
-          <!-- Notch -->
-          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-4 bg-slate-300 dark:bg-slate-800 rounded-b-xl z-20 transition-colors duration-300"></div>
+        <div class="relative w-64 aspect-[9/19.5] border-[6px] border-slate-300 dark:border-slate-800 rounded-[2.5rem] bg-white dark:bg-slate-950 overflow-hidden shadow-2xl shadow-slate-950/10 dark:shadow-slate-950/60 flex flex-col transition-colors duration-300">
           <!-- Screen container -->
           <div class="w-full h-full relative overflow-hidden z-10 bg-slate-50 dark:bg-slate-950 flex-1 transition-colors duration-300">
-            <img src="images/app_screenshot.png" alt="QRIMS Mobile Terminal" class="w-full h-full object-contain">
+            <img src="images/app_screenshot.png" alt="QRIMS Mobile Terminal" class="w-full h-full object-cover">
           </div>
           <!-- Bottom indicator line -->
-          <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-24 h-1 bg-slate-400 dark:bg-slate-700/80 rounded-full z-20 transition-colors duration-300"></div>
+          <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-24 h-1 bg-slate-400/80 dark:bg-slate-700/80 rounded-full z-20 transition-colors duration-300"></div>
         </div>
       </div>
     </div>
