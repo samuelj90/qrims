@@ -1,0 +1,40 @@
+name: Web CI Quality Gate
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/web-ci.yml'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/web-ci.yml'
+
+jobs:
+  web-test:
+    name: Next.js Web Portal CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: apps/web
+
+      - name: Next.js Lint check
+        run: npm run lint
+        working-directory: apps/web
+
+      - name: Run Next.js Build
+        run: npm run build
+        working-directory: apps/web

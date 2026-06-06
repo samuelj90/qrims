@@ -1,0 +1,131 @@
+name: Release Pipeline
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write      # to upload release assets
+  pages: write         # to deploy to GitHub Pages
+  id-token: write      # to verify deployment is from this repo
+
+concurrency:
+  group: "pages-and-release"
+  cancel-in-progress: true
+
+jobs:
+  update-pages-and-build:
+    name: Deploy Changelog & Build Release Binaries
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Generate Changelog File
+        run: |
+          cat <<'EOF' > apps/landing-page/changelog.js
+          // Generated in CI. Do not edit manually.
+          const LATEST_RELEASE = {
+            version: "${{ github.event.release.tag_name }}",
+            published_at: "${{ github.event.release.published_at }}",
+            body: decodeURIComponent("${{ encodeURIComponent(github.event.release.body) }}")
+          };
+          EOF
+        shell: bash
+        env:
+          # Use javascript template evaluation safely in node below
+          # In bash, it's easier to write a small node snippet to generate it so we don't worry about quotes in the release body
+          # Let's do that instead! It is 100% safe against shell injection or quoting issues.
+          DUMMY: ""
+
+      - name: Write Changelog dynamically using Node
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const changelogPath = path.join(process.env.GITHUB_WORKSPACE, 'apps', 'landing-page', 'changelog.js');
+            const release = context.payload.release;
+            
+            const content = `// Generated in CI. Do not edit manually.
+            const LATEST_RELEASE = {
+              version: ${JSON.stringify(release.tag_name)},
+              published_at: ${JSON.stringify(release.published_at)},
+              body: ${JSON.stringify(release.body)}
+            };
+            `;
+            
+            fs.writeFileSync(changelogPath, content, 'utf8');
+            console.log("Successfully generated changelog.js at:", changelogPath);
+
+      - name: Sync Configuration
+        run: node sync_config.js
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          CDN_BASE_URL: "https://raw.githubusercontent.com/samuelj90/qrims/master"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload landing page as Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/landing-page
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      # Now build the mobile applications
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          pub-cache: true
+          pub-cache-key: "pub-cache-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}"
+          cache-key: "flutter-sdk-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}"
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+        working-directory: apps/mobile
+
+      - name: Build Android Release APK
+        run: |
+          # Strip leading 'v' if present for build name
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          VERSION_NAME="${TAG_NAME#v}"
+          flutter build apk --release --build-name="$VERSION_NAME" --build-number=${{ github.run_number }}
+        working-directory: apps/mobile
+
+      - name: Build iOS Release App
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          VERSION_NAME="${TAG_NAME#v}"
+          flutter build ios --release --no-codesign --build-name="$VERSION_NAME" --build-number=${{ github.run_number }}
+        working-directory: apps/mobile
+
+      - name: Zip iOS Build
+        run: |
+          cd apps/mobile/build/ios/iphoneos
+          zip -r Runner.zip Runner.app
+
+      - name: Upload Binaries to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+            apps/mobile/build/ios/iphoneos/Runner.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

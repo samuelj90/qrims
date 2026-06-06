@@ -1,0 +1,49 @@
+name: qrims_mobile
+description: A modern cross-platform QR Inventory Management System client.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management & DI
+  flutter_riverpod: ^3.3.1
+  riverpod_annotation: ^4.0.2
+  
+  # Navigation & Routing
+  go_router: ^17.3.0
+  
+  # Local Database & Cache (Offline-First)
+  drift: ^2.14.0
+  sqlite3_flutter_libs: ^0.6.0+eol
+  path_provider: ^2.1.1
+  path: ^1.8.3
+  
+  # Networking & Security
+  dio: ^5.4.0
+  flutter_secure_storage: ^10.3.1
+  connectivity_plus: ^6.1.5
+  
+  # UI & Icons
+  cupertino_icons: ^1.0.6
+  lucide_icons: ^0.257.0
+  mobile_scanner: ^7.2.0
+  image_picker: ^1.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.2
+  
+  # Code Generation
+  build_runner: ^2.4.8
+  drift_dev: ^2.14.0
+  riverpod_generator: ^4.0.4-dev.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/logo.png

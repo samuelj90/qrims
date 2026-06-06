@@ -1,0 +1,18 @@
+# Ignore dependency directories
+**/node_modules/
+
+# Ignore build outputs
+**/dist/
+**/.next/
+**/out/
+**/build/
+
+# Ignore local config/environments
+**/.env
+**/.env.*
+**/.vscode/
+**/.idea/
+
+# Ignore git
+.git/
+.github/

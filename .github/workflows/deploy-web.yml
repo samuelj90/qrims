@@ -1,0 +1,29 @@
+name: Web CD Deployment
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/deploy-web.yml'
+
+concurrency:
+  group: "deploy-web"
+  cancel-in-progress: true
+
+jobs:
+  deploy-web:
+    name: Deploy Next.js Web Console to Vercel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy Web Client
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WEB }}
+          working-directory: apps/web
+          vercel-args: '--prod'

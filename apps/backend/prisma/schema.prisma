@@ -1,0 +1,126 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+enum CartStatus {
+  PENDING
+  CHECKED_OUT
+  ABANDONED
+}
+
+model User {
+  id            String         @id @default(uuid())
+  username      String         @unique
+  passwordHash  String
+  role          Role           @default(CUSTOMER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?      // Soft delete flag
+  carts         Cart[]
+  sales         Sale[]
+  auditLogs     AuditLog[]
+  refreshTokens RefreshToken[]
+
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id         String     @id @default(uuid())
+  sku        String     @unique
+  name       String
+  price      Float
+  discount   Float      @default(0.0)
+  tax        Float      @default(0.0)
+  compliment String?
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+  cartItems  CartItem[]
+  saleItems  SaleItem[]
+}
+
+model Cart {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  status      CartStatus @default(PENDING)
+  totalAmount Float      @default(0.0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  items       CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  price     Float
+  discount  Float
+  tax       Float
+  quantity  Int
+  createdAt DateTime @default(now())
+}
+
+model Sale {
+  id          String     @id @default(uuid())
+  staffId     String
+  staff       User       @relation(fields: [staffId], references: [id])
+  totalAmount Float
+  createdAt   DateTime   @default(now())
+  items       SaleItem[]
+}
+
+model SaleItem {
+  id        String   @id @default(uuid())
+  saleId    String
+  sale      Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  price     Float
+  discount  Float
+  tax       Float
+  quantity  Int
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  action      String
+  targetTable String
+  targetId    String?
+  changes     Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+}
+
+model SystemSettings {
+  id          Int      @id @default(1)
+  name        String   @default("QRBS")
+  address     String   @default("123052/Street, City")
+  phoneNumber String   @default("944858585858")
+  updatedAt   DateTime @updatedAt
+}

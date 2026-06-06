@@ -1,0 +1,78 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: qrims-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: qrims
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: securepassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - qrims-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d qrims"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: qrims-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - qrims-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
+      args:
+        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-}
+    container_name: qrims-backend
+    command: sh -c "cd apps/backend && npx prisma migrate deploy && npx prisma db seed && cd ../.. && node apps/backend/dist/main"
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:securepassword@postgres:5432/qrims
+      REDIS_HOST: redis
+      JWT_SECRET: supersecretjwtkey
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - qrims-network
+
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-}
+    container_name: qrims-web
+    ports:
+      - "80:3000"
+    environment:
+      API_URL: http://backend:3000
+    depends_on:
+      - backend
+    networks:
+      - qrims-network
+
+volumes:
+  pgdata:
+
+networks:
+  qrims-network:
+    driver: bridge
