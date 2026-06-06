@@ -1,11 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QRIMS - Modern QR Inventory Management System</title>
+  <title>QRIMS - Modern QR Inventory Management Ecosystem</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
   <script src="config.js"></script>
   <script src="changelog.js"></script>
   <script>
@@ -18,7 +31,7 @@
       // Load and render latest release changelog if available
       if (typeof LATEST_RELEASE !== 'undefined' && LATEST_RELEASE) {
         document.getElementById("changelog-version").textContent = LATEST_RELEASE.version;
-        
+
         try {
           const pubDate = new Date(LATEST_RELEASE.published_at);
           const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -28,13 +41,11 @@
         }
 
         const rawBody = LATEST_RELEASE.body || '';
-        // Simple HTML escapes
         let escaped = rawBody
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
 
-        // Parse list items and paragraphs
         const lines = escaped.split('\n');
         let inList = false;
         let finalHtml = '';
@@ -42,12 +53,12 @@
           const trimmed = line.trim();
           if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
             if (!inList) {
-              finalHtml += '<ul>';
+              finalHtml += '<ul class="list-disc pl-5 space-y-2 text-slate-300 my-4">';
               inList = true;
             }
             let itemText = trimmed.substring(2)
-              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-              .replace(/`(.*?)`/g, '<code>$1</code>');
+              .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+              .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-emerald-400 px-1.5 py-0.5 rounded text-xs">$1</code>');
             finalHtml += `<li>${itemText}</li>`;
           } else {
             if (inList) {
@@ -56,16 +67,16 @@
             }
             if (trimmed) {
               let lineText = trimmed
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/`(.*?)`/g, '<code>$1</code>');
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+                .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-emerald-400 px-1.5 py-0.5 rounded text-xs">$1</code>');
               if (lineText.startsWith('### ')) {
-                finalHtml += `<h3>${lineText.substring(4)}</h3>`;
+                finalHtml += `<h3 class="text-lg font-bold text-white mt-6 mb-2">${lineText.substring(4)}</h3>`;
               } else if (lineText.startsWith('## ')) {
-                finalHtml += `<h2>${lineText.substring(3)}</h2>`;
+                finalHtml += `<h2 class="text-xl font-bold text-white mt-8 mb-4 border-b border-slate-800 pb-2">${lineText.substring(3)}</h2>`;
               } else if (lineText.startsWith('# ')) {
-                finalHtml += `<h1>${lineText.substring(2)}</h1>`;
+                finalHtml += `<h1 class="text-2xl font-extrabold text-white mt-10 mb-6">${lineText.substring(2)}</h1>`;
               } else {
-                finalHtml += `<p>${lineText}</p>`;
+                finalHtml += `<p class="text-slate-300 my-2 leading-relaxed">${lineText}</p>`;
               }
             }
           }
@@ -80,263 +91,321 @@
     });
   </script>
 </head>
-<body>
+
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-slate-950 font-sans">
 
   <!-- Header / Navigation -->
-  <header>
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <img src="https://raw.githubusercontent.com/samuelj90/qrims/master/apps/web/public/logo.svg" alt="QRIMS Logo" class="logo-image">
-        <div class="logo-text">QRIMS<span>.</span></div>
+  <header class="sticky top-0 z-50 w-full border-b border-slate-900 bg-slate-950/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5 group">
+        <img src="https://raw.githubusercontent.com/samuelj90/qrims/master/apps/web/public/logo.svg" alt="QRIMS Logo"
+          class="logo-image w-8 h-8 transition-transform duration-300 group-hover:scale-105">
+        <span class="text-xl font-bold tracking-tight text-white">QRIMS<span class="text-emerald-500">.</span></span>
       </a>
-      <ul class="nav-links">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#screenshots">Screenshots</a></li>
-        <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#security">Security</a></li>
-        <li><a href="https://github.com/samuelj90/qrims" class="btn-primary">View GitHub</a></li>
-      </ul>
+      
+      <!-- Nav Links -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="#features" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Features</a>
+        <a href="#screenshots" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Screenshots</a>
+        <a href="#architecture" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Architecture</a>
+        <a href="#security" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Security</a>
+        <a href="https://github.com/samuelj90/qrims" target="_blank" rel="noopener noreferrer" 
+          class="inline-flex items-center justify-center rounded-full bg-slate-900 border border-slate-800 hover:border-slate-700 text-sm font-medium text-white px-4 py-1.5 transition-all hover:bg-slate-800/80">
+          View GitHub
+        </a>
+      </nav>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-tag">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>
-      Redesigned Operations Console
-    </div>
-    <h1>Modern QR Inventory Control <br><span class="gradient">Ecosystem</span></h1>
-    <p class="hero-desc">
-      A premium, real-time administrative platform combining high-performance NestJS backend microservices, Next.js dashboard consoles, and secure Flutter mobile terminals.
-    </p>
-    <div class="hero-actions">
-      <a href="https://github.com/samuelj90/qrims" class="btn-large btn-primary">
-        Get Started
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-      </a>
-      <a href="#features" class="btn-large btn-secondary">Explore Features</a>
-    </div>
+  <section class="relative overflow-hidden py-24 md:py-32 flex flex-col items-center justify-center text-center px-4">
+    <!-- Glow Background decoration -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+    <div class="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-cyan-500/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
-    <!-- Live Preview Showcase -->
-    <div class="dashboard-showcase">
-      <img src="images/admin_screenshot.png" alt="QRIMS Operations Console - Admin Dashboard">
+    <div class="max-w-4xl mx-auto space-y-6">
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+        Modern <span class="bg-gradient-to-r from-emerald-400 via-teal-200 to-cyan-400 bg-clip-text text-transparent">Inventory Management Ecosystem</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        A premium, real-time administrative platform, secure mobile terminals backed by a high performant microservices architecture.
+      </p>
+      <div class="pt-4 flex flex-wrap justify-center gap-4">
+        <a href="https://github.com/samuelj90/qrims" target="_blank" rel="noopener noreferrer" 
+          class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-sm font-semibold text-slate-950 px-6 py-3.5 shadow-lg shadow-emerald-500/15 hover:shadow-emerald-500/25 transition-all">
+          Get Started
+        </a>
+        <a href="#features" 
+          class="inline-flex items-center justify-center rounded-full bg-slate-900 border border-slate-800 hover:border-slate-700 text-sm font-semibold text-white px-6 py-3.5 transition-all hover:bg-slate-800/80">
+          Explore Features
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- Screenshots Showcase Section -->
-  <section id="screenshots" class="screenshots-section">
-    <div class="section-title">
-      <h2>See It In Action</h2>
-      <p>A powerful admin console for operations teams and a clean Flutter app for store staff — working together in real time.</p>
+  <section id="screenshots" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-slate-900">
+    <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">See It In Action</h2>
+      <p class="text-lg text-slate-400">A powerful admin console for operations teams and a clean mobile terminal for store staff and shoppers.</p>
     </div>
-
-    <div class="screenshots-showcase">
-
-      <!-- Admin Dashboard -->
-      <div class="screenshot-panel">
-        <div class="screenshot-label">
-          <div class="screenshot-label-dot dot-admin"></div>
-          <span>Admin Operations Console</span>
-          <span class="screenshot-badge badge-web">Next.js Web</span>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-6xl mx-auto">
+      <!-- Admin Dashboard (Span 8) -->
+      <div class="lg:col-span-8 flex flex-col space-y-3">
+        <div class="flex items-center gap-2 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          Admin Operations Console
         </div>
-        <div class="browser-frame">
-          <div class="browser-bar">
-            <div class="browser-dots">
-              <span class="bd bd-red"></span>
-              <span class="bd bd-yellow"></span>
-              <span class="bd bd-green"></span>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden shadow-2xl shadow-slate-950/60">
+          <!-- Browser Mockup Header -->
+          <div class="flex items-center justify-between bg-slate-950 px-4 py-3 border-b border-slate-800/80">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
             </div>
-            <div class="browser-url">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div class="flex items-center gap-2 bg-slate-900 rounded-lg px-4 py-1 text-slate-400 text-xs border border-slate-800/40 w-72 max-w-xs justify-center font-mono">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-emerald-500">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
               qrims.local/admin/dashboard
             </div>
+            <div class="w-12"></div> <!-- Spacer for symmetry -->
           </div>
-          <div class="browser-content">
-            <img src="images/admin_screenshot.png" alt="QRIMS Admin Dashboard showing Operations Console with live sales, device syncs, and audit logs">
+          <!-- Screenshot Image -->
+          <div class="aspect-video relative overflow-hidden bg-slate-950">
+            <img src="images/admin_screenshot.png"
+              alt="QRIMS Admin Dashboard showing Operations Console with live sales, device syncs, and audit logs"
+              class="w-full h-full object-cover">
           </div>
-        </div>
-        <div class="screenshot-caption">
-          Live sales telemetry, 14 active mobile terminals, RBAC audit logs, and PBKDF2 + AES-GCM encryption status — all at a glance.
         </div>
       </div>
 
-      <!-- Mobile Flutter App -->
-      <div class="screenshot-panel screenshot-panel-mobile">
-        <div class="screenshot-label">
-          <div class="screenshot-label-dot dot-mobile"></div>
-          <span>Flutter Mobile Terminal</span>
-          <span class="screenshot-badge badge-flutter">Flutter</span>
+      <!-- Mobile App (Span 4) -->
+      <div class="lg:col-span-4 flex flex-col space-y-3 items-center lg:items-start w-full">
+        <div class="flex items-center gap-2 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+          <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+          Mobile Terminal
         </div>
-        <div class="phone-frame">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <img src="images/app_screenshot.png" alt="QRIMS Flutter mobile app showing Shopping Cart with QR-scanned External 2TB SSD item">
+        <!-- Phone Mockup Frame -->
+        <div class="relative mx-auto w-64 h-[500px] border-4 border-slate-800 rounded-[3rem] bg-slate-900 overflow-hidden shadow-2xl shadow-slate-950/60 flex flex-col">
+          <!-- Notch -->
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-4 bg-slate-800 rounded-b-xl z-20"></div>
+          <!-- Screen container -->
+          <div class="w-full h-full relative overflow-hidden z-10 bg-slate-950 flex-1">
+            <img src="images/app_screenshot.png" alt="QRIMS Mobile Terminal" class="w-full h-full object-cover">
           </div>
-          <div class="phone-home-bar"></div>
-        </div>
-        <div class="screenshot-caption">
-          QR scan-to-cart workflow with real-time price, tax, and discount calculation. Cart badge syncs instantly across devices.
+          <!-- Bottom indicator line -->
+          <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-24 h-1 bg-slate-700/80 rounded-full z-20"></div>
         </div>
       </div>
-
     </div>
   </section>
 
   <!-- Changelog Section -->
-  <section id="changelog" class="changelog-section" style="display: none;">
-    <div class="section-title">
-      <h2>What's New <span class="gradient">in <span id="changelog-version"></span></span></h2>
-      <p>Released on <span id="changelog-date"></span></p>
+  <section id="changelog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-slate-900" style="display: none;">
+    <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+      <h2 class="text-3xl font-bold tracking-tight text-white">What's New in <span id="changelog-version" class="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent"></span></h2>
+      <p class="text-sm text-slate-400">Released on <span id="changelog-date" class="text-slate-300 font-medium"></span></p>
     </div>
-    <div class="changelog-container">
-      <div id="changelog-body" class="changelog-body">
+    <div class="max-w-3xl mx-auto bg-slate-900/40 border border-slate-800/80 rounded-2xl p-8 backdrop-blur-sm">
+      <div id="changelog-body" class="prose prose-invert max-w-none prose-sm">
         <!-- Rendered changelog -->
       </div>
     </div>
   </section>
 
-  <!-- Features Section (Bento Grid) -->
-  <section id="features">
-    <div class="section-title">
-      <h2>Engineered for Scale & Speed</h2>
-      <p>A unified stack built with state-of-the-art tools for robust real-time product catalogs and operations audits.</p>
+  <!-- Features Section -->
+  <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-slate-900">
+    <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Engineered for Scale & Speed</h2>
+      <p class="text-lg text-slate-400">A unified stack built with state-of-the-art tools for robust real-time product catalogs and operations audits.</p>
     </div>
 
-    <div class="bento-grid">
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-6xl mx-auto">
+      
       <!-- Feature 1: NestJS API -->
-      <div class="bento-card col-8">
-        <div>
-          <div class="card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <div class="md:col-span-8 bg-slate-900/30 border border-slate-800/60 rounded-2xl p-8 hover:border-slate-700/60 hover:bg-slate-900/40 transition-all duration-300 flex flex-col justify-between group">
+        <div class="space-y-4">
+          <div class="inline-flex p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-105 transition-transform duration-300">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5Z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
           </div>
-          <h3>High-Performance NestJS Backend API</h3>
-          <p>Built with modular NestJS architecture, fully typed TS compiler checks, and database-agnostic Prisma ORM. Serves sub-millisecond REST and GraphQL endpoints with global caching.</p>
+          <h3 class="text-xl font-bold text-white">High-Performance Backend API</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Built with modular NestJS architecture, fully typed TS compiler checks, and database-agnostic Prisma ORM. Serves sub-millisecond REST and GraphQL endpoints with global caching.
+          </p>
         </div>
       </div>
 
       <!-- Feature 2: Redis Caching -->
-      <div class="bento-card col-4">
-        <div>
-          <div class="card-icon cyan-theme">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2.5 3.19-2.5 5.5h20c0-2.31-1-4.24-2.5-5.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z"/></svg>
+      <div class="md:col-span-4 bg-slate-900/30 border border-slate-800/60 rounded-2xl p-8 hover:border-slate-700/60 hover:bg-slate-900/40 transition-all duration-300 flex flex-col justify-between group">
+        <div class="space-y-4">
+          <div class="inline-flex p-3 rounded-xl bg-cyan-500/10 text-cyan-400 group-hover:scale-105 transition-transform duration-300">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 16.5c-1.5 1.26-2.5 3.19-2.5 5.5h20c0-2.31-1-4.24-2.5-5.5" />
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z" />
+            </svg>
           </div>
-          <h3>Redis Latency Optimization</h3>
-          <p>In-memory cache layers dramatically lower database load and keep live telemetry response times under 15ms.</p>
+          <h3 class="text-xl font-bold text-white">Ultra Low Latency Caching</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            In-memory cache layers dramatically lower database load and keep live telemetry response times under 15ms.
+          </p>
         </div>
       </div>
 
       <!-- Feature 3: Next.js Dashboard -->
-      <div class="bento-card col-4">
-        <div>
-          <div class="card-icon purple-theme">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3V3z"/><path d="M21 9H3M9 21V9"/></svg>
+      <div class="md:col-span-4 bg-slate-900/30 border border-slate-800/60 rounded-2xl p-8 hover:border-slate-700/60 hover:bg-slate-900/40 transition-all duration-300 flex flex-col justify-between group">
+        <div class="space-y-4">
+          <div class="inline-flex p-3 rounded-xl bg-purple-500/10 text-purple-400 group-hover:scale-105 transition-transform duration-300">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3h18v18H3V3z" />
+              <path d="M21 9H3M9 21V9" />
+            </svg>
           </div>
-          <h3>Next.js 14 Web Panel</h3>
-          <p>Beautiful client console featuring lightning-fast Server Components, static page optimization, and a highly responsive Tailwind CSS layout.</p>
+          <h3 class="text-xl font-bold text-white">Next Gen Admin Console</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Beautiful client console featuring lightning-fast Server Components, static page optimization, and a highly responsive Tailwind CSS layout.
+          </p>
         </div>
       </div>
 
       <!-- Feature 4: Flutter Scanning -->
-      <div class="bento-card col-8">
-        <div>
-          <div class="card-icon emerald-theme">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+      <div class="md:col-span-8 bg-slate-900/30 border border-slate-800/60 rounded-2xl p-8 hover:border-slate-700/60 hover:bg-slate-900/40 transition-all duration-300 flex flex-col justify-between group">
+        <div class="space-y-4">
+          <div class="inline-flex p-3 rounded-xl bg-rose-500/10 text-rose-400 group-hover:scale-105 transition-transform duration-300">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+              <path d="M12 18h.01" />
+            </svg>
           </div>
-          <h3>Flutter Mobile Terminals</h3>
-          <p>Cross-platform mobile client with hardware QR code scanning integration. Out-of-the-box local storage SQLite syncing that pushes queue events back to backend microservices seamlessly.</p>
+          <h3 class="text-xl font-bold text-white">Mobile Terminals</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Cross-platform mobile client with hardware QR code scanning integration. Out-of-the-box local storage SQLite syncing that pushes queue events back to backend microservices seamlessly.
+          </p>
         </div>
       </div>
+
     </div>
   </section>
 
   <!-- Deep Dive 1: Real-time Audits -->
-  <section class="deep-dive" id="architecture">
-    <div class="deep-dive-content">
-      <span class="tag-small">Operations Telemetry</span>
-      <h3>Live Operations & Auditing Console</h3>
-      <p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-slate-900 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center" id="architecture">
+    <div class="space-y-6">
+      <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 uppercase tracking-wider">Operations Telemetry</span>
+      <h3 class="text-3xl font-bold text-white">Live Operations & Auditing Console</h3>
+      <p class="text-slate-400 leading-relaxed">
         Stay on top of system state with built-in RBAC auditing. Every database sync, authorization state update, and device check-in is logged automatically.
       </p>
-      <ul class="feature-list">
-        <li>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
-          Real-time terminal synchronizations showing device network states.
+      <ul class="space-y-4 text-slate-300">
+        <li class="flex items-start gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-500 mt-1 flex-shrink-0">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          <span>Real-time terminal synchronizations showing device network states.</span>
         </li>
-        <li>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
-          Detailed roles logs documenting staff and admin privilege promotions.
+        <li class="flex items-start gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-500 mt-1 flex-shrink-0">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          <span>Detailed roles logs documenting staff and admin privilege promotions.</span>
         </li>
-        <li>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
-          Immediate security warnings for revoked authorization tokens.
+        <li class="flex items-start gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-500 mt-1 flex-shrink-0">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          <span>Immediate security warnings for revoked authorization tokens.</span>
         </li>
       </ul>
     </div>
 
-    <div class="deep-dive-visual">
-      <div class="audit-log-container">
-        <div class="audit-row">
-          <span><span class="audit-tag tag-sys">[SYS]</span> Flush Sync Queue for terminal #F41A</span>
-          <span>00:08</span>
+    <!-- visual mockup -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 font-mono text-xs text-slate-300 shadow-xl max-w-md w-full mx-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+        <span class="text-slate-400 font-semibold uppercase tracking-wider">Live System Logs</span>
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-[10px] text-slate-500">Telemetry Active</span>
+        </span>
+      </div>
+      <div class="space-y-3.5">
+        <div class="flex justify-between items-start gap-4 hover:bg-slate-800/40 p-1.5 rounded transition-colors">
+          <span><span class="text-emerald-400 font-semibold">[SYS]</span> Flush Sync Queue for terminal #F41A</span>
+          <span class="text-slate-500">00:08</span>
         </div>
-        <div class="audit-row">
-          <span><span class="audit-tag tag-sec">[SEC]</span> Token revoked for user ID: customer_3910</span>
-          <span>23:45</span>
+        <div class="flex justify-between items-start gap-4 hover:bg-slate-800/40 p-1.5 rounded transition-colors">
+          <span><span class="text-rose-400 font-semibold">[SEC]</span> Token revoked for user ID: customer_3910</span>
+          <span class="text-slate-500">23:45</span>
         </div>
-        <div class="audit-row">
-          <span><span class="audit-tag tag-adm">[ADM]</span> Danielle promoted to ROLE_STAFF</span>
-          <span>22:04</span>
+        <div class="flex justify-between items-start gap-4 hover:bg-slate-800/40 p-1.5 rounded transition-colors">
+          <span><span class="text-amber-400 font-semibold">[ADM]</span> Danielle promoted to ROLE_STAFF</span>
+          <span class="text-slate-500">22:04</span>
         </div>
-        <div class="audit-row">
-          <span><span class="audit-tag tag-sys">[SYS]</span> DB Connection pool refreshed (Healthy)</span>
-          <span>20:12</span>
+        <div class="flex justify-between items-start gap-4 hover:bg-slate-800/40 p-1.5 rounded transition-colors">
+          <span><span class="text-emerald-400 font-semibold">[SYS]</span> DB Connection pool refreshed (Healthy)</span>
+          <span class="text-slate-500">20:12</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Deep Dive 2: Microservices Stack -->
-  <section class="deep-dive reverse" id="security">
-    <div class="deep-dive-content">
-      <span class="tag-small cyan-text">Infrastructure</span>
-      <h3>Secured and Containerized Architecture</h3>
-      <p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-slate-900 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center" id="security">
+    <div class="space-y-6 lg:order-2">
+      <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 uppercase tracking-wider">Infrastructure</span>
+      <h3 class="text-3xl font-bold text-white">Secured and Containerized Architecture</h3>
+      <p class="text-slate-400 leading-relaxed">
         The entire ecosystem compiles into modular production-grade Docker containers, linking services securely under dedicated bridge networks.
       </p>
-      <ul class="feature-list">
-        <li>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
-          High-strength PBKDF2 + AES-GCM local QR encryption keys.
+      <ul class="space-y-4 text-slate-300">
+        <li class="flex items-start gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-cyan-400 mt-1 flex-shrink-0">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          <span>High-strength PBKDF2 + AES-GCM local QR encryption keys.</span>
         </li>
-        <li>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
-          Secure PostgreSQL storage backed up with persistent Docker volumes.
+        <li class="flex items-start gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-cyan-400 mt-1 flex-shrink-0">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          <span>Secure PostgreSQL storage backed up with persistent Docker volumes.</span>
         </li>
-        <li>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
-          Multi-stage building pipelines for slim alpine deployment images.
+        <li class="flex items-start gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-cyan-400 mt-1 flex-shrink-0">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          <span>Multi-stage building pipelines for slim alpine deployment images.</span>
         </li>
       </ul>
     </div>
 
-    <div class="deep-dive-visual">
-      <div class="arch-flow">
-        <div class="arch-node">Next.js Web Console</div>
-        <div class="arch-arrow">↓</div>
-        <div class="arch-node highlighted">NestJS API Layer</div>
-        <div class="arch-arrow">↓</div>
-        <div class="arch-node">PostgreSQL + Redis Cache</div>
-      </div>
+    <!-- visual mockup diagram -->
+    <div class="lg:order-1 flex flex-col justify-center items-center p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-auto space-y-4">
+      <div class="w-full text-center py-2 bg-slate-950/60 rounded border border-slate-800/80 font-semibold text-xs text-white">Next.js Web Console</div>
+      <div class="text-slate-500 text-xs font-bold">↓</div>
+      <div class="w-full text-center py-2.5 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded border border-emerald-500/30 font-bold text-xs text-emerald-400 shadow shadow-emerald-500/10">NestJS API Layer</div>
+      <div class="text-slate-500 text-xs font-bold">↓</div>
+      <div class="w-full text-center py-2 bg-slate-950/60 rounded border border-slate-800/80 font-semibold text-xs text-white">PostgreSQL + Redis Cache</div>
     </div>
   </section>
 
   <!-- CTA Box -->
-  <section class="cta-section">
-    <div class="cta-box">
-      <h2>Supercharge Your Inventory Catalog</h2>
-      <p>Get started with our lightweight, performant, and fully dockerized stack today.</p>
-      <div class="hero-actions">
-        <a href="https://github.com/samuelj90/qrims" class="btn-large btn-primary">
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/20 border border-slate-800/80 p-8 md:p-12 text-center space-y-6">
+      <div class="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl max-w-2xl mx-auto">Supercharge Your Inventory Catalog</h2>
+      <p class="text-slate-400 max-w-md mx-auto text-sm sm:text-base">Get started with our lightweight, performant, and fully dockerized stack today.</p>
+      <div class="pt-2">
+        <a href="https://github.com/samuelj90/qrims" target="_blank" rel="noopener noreferrer" 
+          class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-sm font-semibold text-slate-950 px-6 py-3.5 transition-all">
           View Repository on GitHub
         </a>
       </div>
@@ -344,21 +413,23 @@
   </section>
 
   <!-- Footer -->
-  <footer>
-    <div class="footer-container">
-      <a href="#" class="logo">
-        <img src="https://raw.githubusercontent.com/samuelj90/qrims/master/apps/web/public/logo.svg" alt="QRIMS Logo" class="logo-image">
-        <div class="logo-text">QRIMS<span>.</span></div>
+  <footer class="border-t border-slate-900 bg-slate-950/60 py-12 text-center text-xs text-slate-500 space-y-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <a href="#" class="flex items-center gap-2 group">
+        <img src="https://raw.githubusercontent.com/samuelj90/qrims/master/apps/web/public/logo.svg" alt="QRIMS Logo"
+          class="logo-image w-6 h-6 transition-transform duration-300 group-hover:scale-105">
+        <span class="text-sm font-bold tracking-tight text-white">QRIMS<span class="text-emerald-500">.</span></span>
       </a>
-      <ul class="nav-links">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#screenshots">Screenshots</a></li>
-        <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#security">Security</a></li>
+      <ul class="flex flex-wrap items-center justify-center gap-6 text-slate-400">
+        <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+        <li><a href="#screenshots" class="hover:text-white transition-colors">Screenshots</a></li>
+        <li><a href="#architecture" class="hover:text-white transition-colors">Architecture</a></li>
+        <li><a href="#security" class="hover:text-white transition-colors">Security</a></li>
       </ul>
     </div>
-    <p class="footer-copyright">&copy; 2026 QRIMS Ecosystem. All rights reserved.</p>
+    <p>&copy; 2026 QRIMS Ecosystem. All rights reserved.</p>
   </footer>
 
 </body>
+
 </html>
